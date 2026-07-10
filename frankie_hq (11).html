@@ -1,0 +1,1648 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>FRANKIE HQ — Portfolio</title>
+<link rel="manifest" href="manifest.json">
+<meta name="theme-color" content="#0B0E14">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="Frankie HQ">
+<link rel="apple-touch-icon" href="icon-192.png">
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=IBM+Plex+Mono:wght@400;500;600&family=IBM+Plex+Sans:wght@400;500&display=swap');
+
+  :root{
+    --bg: #0B0E14;
+    --surface: #131822;
+    --surface-alt: #1B212C;
+    --border: #262D3A;
+    --text: #E8EAED;
+    --muted: #7B8494;
+    --gold: #D4A73C;
+    --gold-dim: #8A742E;
+    --green: #3FB68B;
+    --red: #E0575B;
+    --grey-badge: #3A4150;
+  }
+  *{box-sizing:border-box;}
+  html, body{overflow-x:hidden; max-width:100vw;}
+  body{
+    margin:0;
+    background:var(--bg);
+    color:var(--text);
+    font-family:'IBM Plex Sans', sans-serif;
+    -webkit-font-smoothing:antialiased;
+  }
+  .wrap{max-width:1300px;margin:0 auto;padding:20px 20px 40px;}
+
+  /* ---- Ticker strip (signature element) ---- */
+  .ticker-outer{
+    background:var(--surface);
+    border:1px solid var(--border);
+    border-radius:8px;
+    overflow:hidden;
+    margin-bottom:28px;
+    position:relative;
+  }
+  .ticker-label{
+    position:absolute; left:0; top:0; bottom:0;
+    background:var(--gold);
+    color:#100D02;
+    font-family:'IBM Plex Mono',monospace;
+    font-weight:600;
+    font-size:11px;
+    letter-spacing:0.08em;
+    display:flex; align-items:center;
+    padding:0 14px;
+    z-index:2;
+  }
+  .ticker-track{
+    display:flex;
+    white-space:nowrap;
+    animation:scroll 42s linear infinite;
+    padding-left:130px;
+  }
+  .ticker-outer:hover .ticker-track{animation-play-state:paused;}
+  @keyframes scroll{
+    0%{transform:translateX(0);}
+    100%{transform:translateX(-50%);}
+  }
+  .tick{
+    font-family:'IBM Plex Mono',monospace;
+    font-size:13px;
+    padding:14px 22px;
+    display:flex; align-items:center; gap:8px;
+    border-right:1px solid var(--border);
+  }
+  .tick .sym{color:var(--text); font-weight:600;}
+  .tick .val{color:var(--muted);}
+  .tick.up .val{color:var(--green);}
+  .tick.down .val{color:var(--red);}
+  .tick.flat .val{color:var(--muted);}
+
+  header.page-head{
+    display:flex; justify-content:space-between; align-items:flex-end;
+    margin-bottom:22px; flex-wrap:wrap; gap:10px;
+  }
+  h1{
+    font-family:'Space Grotesk',sans-serif;
+    font-size:30px; font-weight:700; margin:0;
+    letter-spacing:-0.01em;
+  }
+  h1 span{color:var(--gold);}
+  .subtitle{color:var(--muted); font-size:13px; margin-top:4px; font-family:'IBM Plex Mono',monospace;}
+  .asof{
+    font-family:'IBM Plex Mono',monospace;
+    font-size:11px;
+    color:var(--muted);
+    text-align:right;
+    line-height:1.6;
+  }
+
+  .section-label{
+    font-family:'IBM Plex Mono',monospace;
+    font-size:11px;
+    letter-spacing:0.14em;
+    color:var(--gold-dim);
+    text-transform:uppercase;
+    margin:22px 0 10px;
+    display:flex; align-items:center; gap:10px;
+  }
+  .section-label::after{
+    content:''; flex:1; height:1px; background:var(--border);
+  }
+
+  /* ---- Cards grid ---- */
+  .grid{
+    display:grid;
+    grid-template-columns:repeat(4, minmax(0,1fr));
+    gap:10px;
+    min-height:60px;
+  }
+  @media(max-width:1100px){ .grid{grid-template-columns:repeat(3,minmax(0,1fr));} }
+  @media(max-width:820px){ .grid{grid-template-columns:repeat(2,minmax(0,1fr));} }
+  @media(max-width:600px){ .grid{grid-template-columns:1fr;} }
+
+  .card{
+    background:var(--surface);
+    border:1px solid var(--border);
+    border-radius:8px;
+    padding:12px;
+    display:flex; flex-direction:column; gap:6px;
+    transition:border-color .15s ease;
+  }
+  .card:hover{border-color:var(--gold-dim);}
+  .card-top{display:flex; justify-content:space-between; align-items:flex-start;}
+  .card-name{font-family:'Space Grotesk',sans-serif; font-weight:600; font-size:13.5px; overflow-wrap:break-word; min-width:0;}
+  .card-code{font-family:'IBM Plex Mono',monospace; font-size:9.5px; color:var(--muted); margin-top:1px; overflow-wrap:break-word;}
+  .rating{
+    font-family:'IBM Plex Mono',monospace;
+    font-size:16px; font-weight:600;
+    color:var(--gold);
+    white-space:nowrap;
+  }
+  .rating small{font-size:9.5px; color:var(--muted); font-weight:400;}
+  .dots{display:flex; gap:2px; margin-top:2px;}
+  .dot{width:5px; height:5px; border-radius:50%; background:var(--border);}
+  .dot.on{background:var(--gold);}
+
+  .badge{
+    display:inline-block;
+    font-family:'IBM Plex Mono',monospace;
+    font-size:9px;
+    letter-spacing:0.05em;
+    padding:2px 6px;
+    border-radius:4px;
+    text-transform:uppercase;
+    width:fit-content;
+  }
+  .badge.confirmed{background:rgba(63,182,139,0.12); color:var(--green); border:1px solid rgba(63,182,139,0.3);}
+  .badge.pipeline{background:rgba(212,167,60,0.12); color:var(--gold); border:1px solid rgba(212,167,60,0.3);}
+  .badge.pre{background:rgba(123,132,148,0.15); color:var(--muted); border:1px solid var(--border);}
+  .badge.risk{background:rgba(224,87,91,0.12); color:var(--red); border:1px solid rgba(224,87,91,0.3);}
+
+  .card-body{font-size:11px; color:var(--muted); line-height:1.4;}
+  .card-body b{color:var(--text); font-weight:500;}
+  .stat-row{
+    display:flex; justify-content:space-between;
+    font-family:'IBM Plex Mono',monospace;
+    font-size:11px;
+    border-top:1px solid var(--border);
+    padding-top:6px; margin-top:1px;
+  }
+  .stat-row .v{color:var(--text);}
+  .stat-row .v.pos{color:var(--green);}
+  .stat-row .v.neg{color:var(--red);}
+
+  /* ---- Lower section: calendar + open items ---- */
+  .lower{
+    display:grid;
+    grid-template-columns: 1.15fr 0.85fr;
+    min-width:0;
+    gap:20px;
+    margin-top:10px;
+  }
+  @media(max-width:820px){ .lower{grid-template-columns:1fr;} }
+
+  .panel{
+    background:var(--surface);
+    border:1px solid var(--border);
+    border-radius:10px;
+    padding:20px;
+  }
+  .panel-title{
+    font-family:'Space Grotesk',sans-serif;
+    font-weight:600; font-size:15px;
+    margin:0 0 4px;
+  }
+  .panel-sub{font-family:'IBM Plex Mono',monospace; font-size:11px; color:var(--muted); margin-bottom:16px;}
+
+  .cal-grid{
+    display:grid;
+    grid-template-columns:repeat(7,1fr);
+    gap:5px;
+  }
+  .cal-dow{
+    font-family:'IBM Plex Mono',monospace;
+    font-size:10px; color:var(--muted); text-align:center; padding-bottom:4px;
+    letter-spacing:0.05em;
+  }
+  .cal-day{
+    aspect-ratio:1;
+    display:flex; align-items:center; justify-content:center;
+    font-family:'IBM Plex Mono',monospace;
+    font-size:12px;
+    color:var(--muted);
+    background:var(--surface-alt);
+    border-radius:6px;
+    border:1px solid transparent;
+  }
+  .cal-day.empty{background:transparent;}
+  .cal-day.today{
+    background:var(--gold);
+    color:#100D02;
+    font-weight:700;
+    border-color:var(--gold);
+  }
+
+  .items-list{list-style:none; margin:0; padding:0; display:flex; flex-direction:column; gap:12px;}
+  .item{
+    display:flex; gap:10px; align-items:flex-start;
+    border-left:2px solid var(--gold-dim);
+    padding-left:12px;
+  }
+  .item.risk{border-left-color:var(--red);}
+  .item-text{font-size:13px; line-height:1.5;}
+  .item-text b{color:var(--gold);}
+  .item-tag{
+    font-family:'IBM Plex Mono',monospace;
+    font-size:9.5px;
+    color:var(--muted);
+    text-transform:uppercase;
+    letter-spacing:0.05em;
+    display:block;
+    margin-bottom:2px;
+  }
+
+  .total-bar{
+    background:linear-gradient(180deg, var(--surface) 0%, var(--surface-alt) 100%);
+    border:1px solid var(--gold-dim);
+    border-radius:10px;
+    padding:16px 20px;
+    display:flex; align-items:baseline; gap:14px;
+    margin-bottom:16px;
+    flex-wrap:wrap;
+  }
+  .total-label{
+    font-family:'IBM Plex Mono',monospace; font-size:11px; letter-spacing:0.1em;
+    color:var(--gold); text-transform:uppercase;
+  }
+  .total-value{
+    font-family:'Space Grotesk',sans-serif; font-size:28px; font-weight:700;
+  }
+  .total-sub{font-family:'IBM Plex Mono',monospace; font-size:10.5px; color:var(--muted); margin-left:auto;}
+
+  .edit-row{
+    display:flex; align-items:center; gap:5px;
+    border-top:1px solid var(--border);
+    padding-top:5px; margin-top:1px;
+  }
+  .edit-row label{
+    font-family:'IBM Plex Mono',monospace; font-size:9.5px; color:var(--muted);
+    white-space:nowrap;
+  }
+  .edit-row input{
+    flex:1; min-width:0;
+    background:var(--surface-alt);
+    border:1px solid var(--border);
+    border-radius:5px;
+    padding:4px 6px;
+    color:var(--gold);
+    font-family:'IBM Plex Mono',monospace;
+    font-size:11px;
+    text-align:right;
+  }
+  .edit-row input:focus{outline:none; border-color:var(--gold-dim);}
+  .edit-row .saved-tick{
+    font-size:10px; color:var(--green); opacity:0; transition:opacity .3s;
+    font-family:'IBM Plex Mono',monospace;
+  }
+  .edit-row .saved-tick.show{opacity:1;}
+
+  /* ---- Sidebar layout ---- */
+  .main-layout{
+    display:grid;
+    grid-template-columns: 240px minmax(0,1fr);
+    gap:16px;
+    align-items:start;
+  }
+  @media(max-width:820px){ .main-layout{grid-template-columns:1fr;} }
+
+  .sidebar{
+    display:flex; flex-direction:column; gap:14px;
+    position:sticky; top:16px;
+  }
+  @media(max-width:820px){ .sidebar{position:static;} }
+
+  .calc-panel input, .calc-panel select{
+    width:100%;
+    background:var(--surface-alt);
+    border:1px solid var(--border);
+    border-radius:6px;
+    padding:8px 10px;
+    color:var(--text);
+    font-family:'IBM Plex Mono',monospace;
+    font-size:12.5px;
+    margin-bottom:10px;
+  }
+  .calc-panel input:focus, .calc-panel select:focus{outline:none; border-color:var(--gold-dim);}
+  .calc-panel label{
+    font-family:'IBM Plex Mono',monospace; font-size:10px; color:var(--muted);
+    display:block; margin-bottom:4px; text-transform:uppercase; letter-spacing:0.05em;
+  }
+  .calc-result{
+    background:var(--surface-alt);
+    border:1px solid var(--gold-dim);
+    border-radius:6px;
+    padding:12px;
+    text-align:center;
+    margin-top:6px;
+  }
+  .calc-result .num{
+    font-family:'Space Grotesk',sans-serif; font-weight:700; font-size:22px; color:var(--gold);
+  }
+  .calc-result .cap{
+    font-family:'IBM Plex Mono',monospace; font-size:9.5px; color:var(--muted);
+    text-transform:uppercase; letter-spacing:0.05em; margin-top:2px;
+  }
+
+  /* ---- Flip task card ---- */
+  .tasks-card{
+    perspective:1000px;
+    height:220px;
+    cursor:pointer;
+  }
+  .tasks-card-inner{
+    position:relative; width:100%; height:100%;
+    transition:transform .5s;
+    transform-style:preserve-3d;
+  }
+  .tasks-card.flipped .tasks-card-inner{transform:rotateY(180deg);}
+  .tasks-face{
+    position:absolute; inset:0;
+    backface-visibility:hidden;
+    background:var(--surface);
+    border:1px solid var(--border);
+    border-radius:10px;
+    padding:16px;
+    display:flex; flex-direction:column;
+  }
+  .tasks-face.back{transform:rotateY(180deg);}
+  .tasks-face .panel-title{margin-bottom:2px;}
+  .tasks-hint{
+    font-family:'IBM Plex Mono',monospace; font-size:10px; color:var(--muted); margin-top:auto;
+  }
+  .tasks-face textarea{
+    flex:1; width:100%; resize:none;
+    background:var(--surface-alt);
+    border:1px solid var(--border);
+    border-radius:6px;
+    padding:10px;
+    color:var(--text);
+    font-family:'IBM Plex Mono',monospace;
+    font-size:12px;
+    margin-top:8px;
+  }
+  .tasks-face textarea:focus{outline:none; border-color:var(--gold-dim);}
+
+  /* ---- Draggable cards ---- */
+  .card{cursor:grab;}
+  .card:active{cursor:grabbing;}
+  .card.dragging{opacity:0.4;}
+  .card.drag-over{border-color:var(--gold); border-style:dashed;}
+
+  .add-venture-row{margin-bottom:12px;}
+  .add-venture-btn{
+    background:var(--gold); color:#100D02; border:none; border-radius:6px;
+    padding:9px 16px; font-family:'IBM Plex Mono',monospace; font-weight:700;
+    font-size:12px; letter-spacing:0.05em; cursor:pointer;
+  }
+  .add-venture-btn:hover{background:#E3B94E;}
+  .add-venture-cancel{
+    background:none; color:var(--muted); border:1px solid var(--border); border-radius:6px;
+    padding:9px 16px; font-family:'IBM Plex Mono',monospace; font-weight:600;
+    font-size:12px; cursor:pointer; margin-left:8px;
+  }
+  .add-venture-cancel:hover{border-color:var(--red); color:var(--red);}
+  .add-venture-form{margin-bottom:16px;}
+  .add-venture-form label{
+    font-family:'IBM Plex Mono',monospace; font-size:10px; color:var(--muted);
+    text-transform:uppercase; letter-spacing:0.05em; display:block; margin:10px 0 4px;
+  }
+  .add-venture-form input, .add-venture-form select{
+    width:100%; background:var(--surface-alt); border:1px solid var(--border);
+    border-radius:6px; padding:8px 10px; color:var(--text);
+    font-family:'IBM Plex Mono',monospace; font-size:12.5px;
+  }
+  .add-venture-form input:focus, .add-venture-form select:focus{outline:none; border-color:var(--gold-dim);}
+  .add-venture-actions{margin-top:14px;}
+
+  /* ---- Per-venture card flip for tasks ---- */
+  .card-flip-outer{perspective:1000px;}
+  .card-flip-inner{
+    position:relative; width:100%; height:100%;
+    transition:transform .5s; transform-style:preserve-3d;
+  }
+  .card-flip-outer.flipped .card-flip-inner{transform:rotateY(180deg);}
+  .card-face{
+    backface-visibility:hidden;
+  }
+  .card-face.back{
+    position:absolute; top:0; left:0; width:100%; height:100%;
+    transform:rotateY(180deg);
+    background:var(--surface); border:1px solid var(--border); border-radius:10px;
+    padding:18px; display:flex; flex-direction:column;
+  }
+  .card-face.back textarea{
+    flex:1; width:100%; resize:none; margin-top:8px;
+    background:var(--surface-alt); border:1px solid var(--border); border-radius:6px;
+    padding:10px; color:var(--text); font-family:'IBM Plex Mono',monospace; font-size:12px;
+  }
+  .card-face.back textarea:focus{outline:none; border-color:var(--gold-dim);}
+  .card-flip-btn{
+    background:none; border:1px solid var(--border); color:var(--muted);
+    border-radius:5px; padding:3px 8px; font-family:'IBM Plex Mono',monospace;
+    font-size:9.5px; cursor:pointer; white-space:nowrap;
+  }
+  .card-flip-btn:hover{border-color:var(--gold-dim); color:var(--gold);}
+
+  .total-split{display:flex; gap:14px; flex-wrap:wrap; margin-bottom:16px;}
+  .total-split .total-bar{flex:1; min-width:220px; margin-bottom:0;}
+  .total-bar.projected{border-color:var(--border);}
+  .total-bar.projected .total-label{color:var(--muted);}
+  .total-bar.projected .total-value{color:var(--text);}
+
+  .chat-log{
+    display:flex; flex-direction:column; gap:10px;
+    max-height:320px; overflow-y:auto;
+    margin-bottom:14px;
+    padding-right:4px;
+  }
+  .chat-log::-webkit-scrollbar{width:6px;}
+  .chat-log::-webkit-scrollbar-thumb{background:var(--border); border-radius:3px;}
+  .msg{font-family:'IBM Plex Mono',monospace; font-size:12.5px; line-height:1.6;}
+  .msg .who{color:var(--gold); font-weight:600; margin-right:6px;}
+  .msg.user .who{color:var(--text);}
+  .msg.assistant{color:var(--text);}
+  .msg.assistant .who{color:var(--gold);}
+  .msg.pending{color:var(--muted); font-style:italic;}
+  .chat-form{display:flex; align-items:center; gap:8px; border-top:1px solid var(--border); padding-top:12px;}
+  .prompt-caret{font-family:'IBM Plex Mono',monospace; color:var(--gold); font-weight:700;}
+  .chat-input{
+    flex:1;
+    background:var(--surface-alt);
+    border:1px solid var(--border);
+    border-radius:6px;
+    padding:9px 12px;
+    color:var(--text);
+    font-family:'IBM Plex Mono',monospace;
+    font-size:12.5px;
+  }
+  .chat-input:focus{outline:none; border-color:var(--gold-dim);}
+  .chat-send{
+    background:var(--gold);
+    color:#100D02;
+    border:none;
+    border-radius:6px;
+    padding:9px 14px;
+    font-family:'IBM Plex Mono',monospace;
+    font-weight:700;
+    font-size:11px;
+    letter-spacing:0.05em;
+    cursor:pointer;
+  }
+  .chat-send:disabled{opacity:0.5; cursor:not-allowed;}
+  .chat-send:hover:not(:disabled){background:#E3B94E;}
+
+  .contact-form{
+    display:flex; gap:8px; flex-wrap:wrap; margin-bottom:16px;
+    border-bottom:1px solid var(--border); padding-bottom:16px;
+  }
+  .contact-form input, .contact-form select{
+    background:var(--surface-alt);
+    border:1px solid var(--border);
+    border-radius:6px;
+    padding:8px 10px;
+    color:var(--text);
+    font-family:'IBM Plex Mono',monospace;
+    font-size:12px;
+  }
+  .contact-form input[type=text]{flex:1; min-width:120px;}
+  .contact-form select{min-width:130px;}
+  .contact-form input:focus, .contact-form select:focus{outline:none; border-color:var(--gold-dim);}
+  .contact-form button{
+    background:var(--gold); color:#100D02; border:none; border-radius:6px;
+    padding:8px 16px; font-family:'IBM Plex Mono',monospace; font-weight:700;
+    font-size:11px; letter-spacing:0.05em; cursor:pointer;
+  }
+  .contact-form button:hover{background:#E3B94E;}
+
+  .contact-list{display:flex; flex-direction:column; gap:8px;}
+  .contact-row{
+    display:flex; align-items:center; gap:12px; flex-wrap:wrap;
+    background:var(--surface-alt);
+    border:1px solid var(--border);
+    border-radius:8px;
+    padding:10px 14px;
+  }
+  .contact-row .c-name{font-family:'Space Grotesk',sans-serif; font-weight:600; font-size:13.5px; min-width:120px;}
+  .contact-row .c-tag{
+    font-family:'IBM Plex Mono',monospace; font-size:10px; text-transform:uppercase;
+    background:rgba(212,167,60,0.12); color:var(--gold); border:1px solid rgba(212,167,60,0.3);
+    padding:2px 8px; border-radius:4px; white-space:nowrap;
+  }
+  .contact-row .c-venture{font-family:'IBM Plex Mono',monospace; font-size:10.5px; color:var(--muted); white-space:nowrap;}
+  .contact-row .c-notes{font-size:12px; color:var(--muted); flex:1; min-width:140px;}
+  .contact-row .c-del{
+    background:none; border:1px solid var(--border); color:var(--muted);
+    border-radius:5px; padding:4px 8px; font-family:'IBM Plex Mono',monospace;
+    font-size:10px; cursor:pointer;
+  }
+  .contact-row .c-del:hover{border-color:var(--red); color:var(--red);}
+  .contact-empty{font-family:'IBM Plex Mono',monospace; font-size:12px; color:var(--muted); text-align:center; padding:20px 0;}
+
+  footer{
+    margin-top:36px;
+    font-family:'IBM Plex Mono',monospace;
+    font-size:11px;
+    color:var(--muted);
+    text-align:center;
+    line-height:1.7;
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <div class="ticker-outer">
+    <div class="ticker-label">PORTFOLIO</div>
+    <div class="ticker-track" id="tickerTrack"></div>
+  </div>
+
+  <header class="page-head">
+    <div>
+      <h1>FRANKIE <span>HQ</span></h1>
+      <div class="subtitle">venture portfolio — Newberg, OR</div>
+    </div>
+    <div class="asof">
+      SNAPSHOT — JUL 09 2026<br>
+      built from conversation history<br>
+      not live data · not financial advice
+    </div>
+  </header>
+
+  <div class="section-label">Active Positions</div>
+
+  <div class="main-layout">
+    <aside class="sidebar">
+      <div class="panel calc-panel">
+        <div class="panel-title">Revenue Calculator</div>
+        <div class="panel-sub">deal size &times; commission rate</div>
+        <label>Deal / Revenue Amount ($)</label>
+        <input type="number" id="calcAmount" placeholder="70000" value="70000">
+        <label>Commission Rate (%)</label>
+        <input type="number" id="calcRate" placeholder="8" value="8" step="0.5">
+        <div class="calc-result">
+          <div class="num" id="calcResult">$5,600</div>
+          <div class="cap">projected commission</div>
+        </div>
+        <label>Apply To Venture</label>
+        <select id="calcVentureSelect"></select>
+        <label>Field</label>
+        <select id="calcFieldSelect">
+          <option value="realized">Realized / Current</option>
+          <option value="projected">Projected</option>
+        </select>
+        <button type="button" id="calcApplyBtn" class="add-venture-btn" style="width:100%; margin-top:10px;">Add to Venture</button>
+        <div class="cap" id="calcApplyStatus" style="text-align:center; margin-top:6px; color:var(--green); height:14px;"></div>
+      </div>
+
+      <div class="tasks-card" id="tasksCard">
+        <div class="tasks-card-inner">
+          <div class="tasks-face front">
+            <div class="panel-title">Tasks</div>
+            <div class="panel-sub" id="taskCount">0 items</div>
+            <div class="tasks-hint">click to flip &amp; edit &rarr;</div>
+          </div>
+          <div class="tasks-face back">
+            <div class="panel-title">Tasks</div>
+            <textarea id="taskInput" placeholder="- follow up with shonn&#10;- book onboarding calls&#10;- oregon collection agency registration" onclick="event.stopPropagation()"></textarea>
+          </div>
+        </div>
+      </div>
+    </aside>
+
+    <div class="main-col">
+      <div class="total-split">
+        <div class="total-bar" id="totalBar">
+          <div class="total-label">Realized</div>
+          <div class="total-value" id="totalRealized">$0</div>
+          <div class="total-sub">confirmed / in-hand</div>
+        </div>
+        <div class="total-bar projected" id="totalBarProjected">
+          <div class="total-label">Projected</div>
+          <div class="total-value" id="totalProjected">$0</div>
+          <div class="total-sub">potential / pipeline</div>
+        </div>
+      </div>
+
+      <div class="add-venture-row">
+        <button id="addVentureBtn" class="add-venture-btn">+ Add Venture</button>
+      </div>
+      <div class="panel add-venture-form" id="addVentureForm" style="display:none;">
+        <label>Name</label>
+        <input type="text" id="newVentureName" placeholder="e.g. New Consulting Client">
+        <label>Code / Category</label>
+        <input type="text" id="newVentureCode" placeholder="e.g. consulting, retainer">
+        <label>Rating (0-10)</label>
+        <input type="number" id="newVentureRating" min="0" max="10" value="5">
+        <label>Status</label>
+        <select id="newVentureStatus">
+          <option value="confirmed">Confirmed / Active</option>
+          <option value="pipeline">Pipeline / Building</option>
+          <option value="pre">Pre-Revenue</option>
+          <option value="risk">Risk / Under Review</option>
+        </select>
+        <label>Description</label>
+        <input type="text" id="newVentureBody" placeholder="Short description">
+        <div class="add-venture-actions">
+          <button id="saveVentureBtn" class="add-venture-btn">Save</button>
+          <button id="cancelVentureBtn" class="add-venture-cancel">Cancel</button>
+        </div>
+      </div>
+
+      <div class="grid" id="cardGrid"></div>
+    </div>
+  </div>
+
+  <div class="section-label">Business Ideas <span style="font-weight:400;text-transform:none;">(pre-launch, not counted in totals above)</span></div>
+  <div class="grid" id="ideaGrid"></div>
+
+  <div class="section-label">Contacts</div>
+  <div class="panel" id="contactsPanel">
+    <div class="panel-title">People</div>
+    <div class="panel-sub">leads, clients, partners &mdash; tied to a venture or standalone</div>
+
+    <form id="contactForm" class="contact-form">
+      <input type="text" id="contactName" placeholder="Name" required>
+      <input type="text" id="contactTag" placeholder="Tag (Lead, Client, Partner...)">
+      <select id="contactVenture"><option value="">No venture</option></select>
+      <input type="text" id="contactNotes" placeholder="Notes">
+      <button type="submit">ADD</button>
+    </form>
+
+    <div class="contact-list" id="contactList"></div>
+  </div>
+
+  <div class="section-label">Deal Tracker</div>
+  <div class="panel" id="dealsPanel">
+    <div class="panel-title">Investment &amp; Deal Opportunities</div>
+    <div class="panel-sub">loans, investments, buyouts, service deals under review</div>
+
+    <form id="dealForm" class="contact-form">
+      <input type="text" id="dealName" placeholder="Deal name" required>
+      <select id="dealType">
+        <option value="Investment">Investment</option>
+        <option value="Loan">Loan</option>
+        <option value="Buyout">Buyout</option>
+        <option value="Service Deal">Service Deal</option>
+        <option value="Other">Other</option>
+      </select>
+      <input type="number" id="dealAmount" placeholder="Amount ($)">
+      <select id="dealStatus">
+        <option value="Evaluating">Evaluating</option>
+        <option value="Active">Active</option>
+        <option value="Closed">Closed</option>
+        <option value="Declined / Passed">Declined / Passed</option>
+      </select>
+      <input type="text" id="dealTerms" placeholder="Terms (e.g. 2.5x buyout, 15% profit share)">
+      <input type="text" id="dealNotes" placeholder="Notes">
+      <button type="submit">ADD</button>
+    </form>
+
+    <div class="contact-list" id="dealList"></div>
+  </div>
+
+  <div class="lower">
+    <div class="panel">
+      <div class="panel-title">July 2026</div>
+      <div class="panel-sub">today marked · no fabricated deadlines shown</div>
+      <div class="cal-grid" id="calGrid"></div>
+    </div>
+
+    <div class="panel">
+      <div class="panel-title">Open Items</div>
+      <div class="panel-sub">real, unresolved, pulled from our conversations</div>
+      <ul class="items-list" id="itemsList"></ul>
+    </div>
+  </div>
+
+  <div class="section-label">Frankie Terminal</div>
+  <div class="panel" id="terminalPanel">
+    <div class="panel-title">Ask Frankie</div>
+    <div class="panel-sub">grounded only in the portfolio data on this page — will say so if it doesn't know something</div>
+    <div id="chatLog" class="chat-log"></div>
+    <form id="chatForm" class="chat-form">
+      <span class="prompt-caret">&gt;</span>
+      <input id="chatInput" class="chat-input" type="text" placeholder="ask about a position, a rating, an open item..." autocomplete="off" />
+      <button type="submit" class="chat-send">SEND</button>
+    </form>
+  </div>
+
+  <footer>
+    Ratings and figures reflect what's been discussed in conversation, not independently verified or real-time data.<br>
+    SecureBags is the only stream with confirmed recurring closed revenue this month.
+  </footer>
+
+</div>
+
+<script>
+// ---- Real persistence via Supabase (replaces Claude-artifact-only window.storage) ----
+const SUPABASE_URL = 'https://vdtbxzjuxckwuzzhrjga.supabase.co';
+const SUPABASE_KEY = 'sb_publishable_9gu5tAC9TRSfnlNeY5VThQ_y5w_lAUV';
+
+// Visible error banner so failures show on-screen without needing dev tools
+const debugBanner = document.createElement('div');
+debugBanner.style.cssText = 'position:fixed;top:0;left:0;right:0;background:#B23B36;color:#fff;font-family:monospace;font-size:12px;padding:8px 14px;z-index:9999;display:none;';
+document.body.appendChild(debugBanner);
+function showStorageError(action, err){
+  debugBanner.style.display = 'block';
+  debugBanner.textContent = `STORAGE ${action} FAILED: ${err.message}`;
+  console.error(`storage ${action} error:`, err);
+}
+
+window.storage = {
+  async get(key, shared){
+    const res = await fetch(`${SUPABASE_URL}/rest/v1/dashboard_data?id=eq.${encodeURIComponent(key)}&select=value`, {
+      headers: { apikey: SUPABASE_KEY, Authorization: `Bearer ${SUPABASE_KEY}` }
+    });
+    if(!res.ok){
+      const body = await res.text();
+      const err = new Error(`${res.status} ${body}`);
+      showStorageError('GET', err);
+      throw err;
+    }
+    const rows = await res.json();
+    if(!rows.length) throw new Error('key not found');
+    return { key, value: rows[0].value, shared: !!shared };
+  },
+  async set(key, value, shared){
+    const res = await fetch(`${SUPABASE_URL}/rest/v1/dashboard_data`, {
+      method: 'POST',
+      headers: {
+        apikey: SUPABASE_KEY,
+        Authorization: `Bearer ${SUPABASE_KEY}`,
+        'Content-Type': 'application/json',
+        Prefer: 'resolution=merge-duplicates,return=representation'
+      },
+      body: JSON.stringify({ id: key, value: String(value) })
+    });
+    if(!res.ok){
+      const body = await res.text();
+      const err = new Error(`${res.status} ${body}`);
+      showStorageError('SET', err);
+      throw err;
+    }
+    return { key, value, shared: !!shared };
+  },
+  async delete(key, shared){
+    const res = await fetch(`${SUPABASE_URL}/rest/v1/dashboard_data?id=eq.${encodeURIComponent(key)}`, {
+      method: 'DELETE',
+      headers: { apikey: SUPABASE_KEY, Authorization: `Bearer ${SUPABASE_KEY}` }
+    });
+    if(!res.ok){
+      const body = await res.text();
+      const err = new Error(`${res.status} ${body}`);
+      showStorageError('DELETE', err);
+      throw err;
+    }
+    return { key, deleted: true, shared: !!shared };
+  },
+  async list(prefix, shared){
+    let url = `${SUPABASE_URL}/rest/v1/dashboard_data?select=id`;
+    if(prefix) url += `&id=like.${encodeURIComponent(prefix)}*`;
+    const res = await fetch(url, { headers: { apikey: SUPABASE_KEY, Authorization: `Bearer ${SUPABASE_KEY}` } });
+    if(!res.ok){
+      const body = await res.text();
+      const err = new Error(`${res.status} ${body}`);
+      showStorageError('LIST', err);
+      throw err;
+    }
+    const rows = await res.json();
+    return { keys: rows.map(r=>r.id), prefix, shared: !!shared };
+  }
+};
+
+const ventures = [
+  {
+    name:"SecureBags", code:"SBAG · commission sales", rating:8, status:"confirmed",
+    statusLabel:"Active · Confirmed Revenue",
+    body:"8% of ARR per closed deal. This month: ~$70K ARR closed &rarr; <b>~$5,600 commission</b>. Pipeline: Cohere/Antoinette, Veterans Room/Chibunna, King Industrials/Jaryd, Marrowbone/Chris.",
+    stat:{label:"Commission this month ($)", defaultNum:5600},
+    projected:{label:"Projected pipeline ($)", defaultNum:0}
+  },
+  {
+    name:"DentalROI / MarketIgniter", code:"DROI · commission sales", rating:5, status:"pipeline",
+    statusLabel:"Built · Unconfirmed",
+    body:"Commission-only, dental & SMB digital marketing. Prospect tracker + cold email sequences built for SW Michigan dental practices. No closed deal confirmed yet.",
+    stat:{label:"Closed revenue ($)", defaultNum:0},
+    projected:{label:"Projected pipeline ($)", defaultNum:0}
+  },
+  {
+    name:"Merchant Cost Consulting", code:"MCC · referral income", rating:5, status:"pipeline",
+    statusLabel:"Built · Unconfirmed",
+    body:"25% of savings found, scaling to 30% at 10 conversions, 35% at 25. Pipeline built by repurposing SecureBags closed-lost leads.",
+    stat:{label:"Payout received ($)", defaultNum:0},
+    projected:{label:"Projected pipeline ($)", defaultNum:0}
+  },
+  {
+    name:"Ren Energy", code:"REN · consulting", rating:1, status:"pre",
+    statusLabel:"Unpaid",
+    body:"Consulting work performed at no compensation. Zero direct revenue by design.",
+    stat:{label:"Revenue ($)", defaultNum:0},
+    projected:{label:"Projected ($)", defaultNum:0}
+  },
+  {
+    name:"ES Futures Trading", code:"ESU6 · Tradeify funded", rating:4, status:"pipeline",
+    statusLabel:"Pre-Payout",
+    body:"Lightning 100K &amp; Growth 100K accounts. MACD / 8-13 EMA / test-and-retest strategy. 20% consistency rule + trailing drawdown still to navigate. One documented winning day on new Lightning account.",
+    stat:{label:"Payout received ($)", defaultNum:0},
+    projected:{label:"Projected payout ($)", defaultNum:0}
+  },
+  {
+    name:"LEAP Diagonal Spreads", code:"$NOW $140C · HOOD $85C · Jan 2028", rating:6, status:"confirmed",
+    statusLabel:"Unrealized Gain",
+    body:"3x $NOW + 3x HOOD LEAP calls, cost basis $23,820. Was ~$1,800 underwater at Jun 8 snapshot. Per your latest update: up ~$6,000 on cost basis (~25.2%), before separate short-call premium collected.",
+    stat:{label:"Unrealized gain ($)", defaultNum:6000},
+    projected:{label:"Projected at expiry ($)", defaultNum:0}
+  },
+  {
+    name:"Roofing Collections", code:"ROOF · 5% contingency", rating:4, status:"pre",
+    statusLabel:"Pre-Revenue",
+    body:"Contingency collections for storm/hail contractors (depreciation + ACV disputes). Investor pitch deck built with IBISWorld/Mordor data. Oregon ORS 697 registration + $10-15K surety bond still outstanding.",
+    stat:{label:"Revenue ($)", defaultNum:0},
+    projected:{label:"Projected ($)", defaultNum:0}
+  },
+  {
+    name:"Forge IBEW Prep App", code:"FORGE · lead tool", rating:3, status:"pre",
+    statusLabel:"Live · No Monetization",
+    body:"Deployed on GitHub Pages, capturing emails via Formspree. No revenue model or conversion data confirmed yet.",
+    stat:{label:"Revenue ($)", defaultNum:0},
+    projected:{label:"Projected ($)", defaultNum:0}
+  },
+  {
+    name:"Zero Gravity Massage Loan", code:"ZGM · Shonn Piersol deal", rating:2, status:"risk",
+    statusLabel:"Unresolved · Do Not Fund",
+    body:"$10K in &rarr; $20K over 36mo via profit-participation on one new location. Open: possible unregistered-securities structure, unclear entity liability if location closes, financials still unverified (mgmt estimates only), partner-split criteria unexplained.",
+    stat:{label:"Funds committed ($)", defaultNum:0},
+    projected:{label:"Projected return ($)", defaultNum:0}
+  },
+];
+
+const grid = document.getElementById('cardGrid');
+const totalRealizedEl = document.getElementById('totalRealized');
+const totalProjectedEl = document.getElementById('totalProjected');
+const STORAGE_PREFIX = 'venture-value:';
+const ORDER_KEY = 'card-order';
+
+function fmtMoney(n){
+  const sign = n < 0 ? '-' : '';
+  return sign + '$' + Math.abs(Math.round(n)).toLocaleString();
+}
+
+async function loadValue(key, fallback){
+  try{
+    const res = await window.storage.get(STORAGE_PREFIX+key, false);
+    if(res && res.value !== undefined && res.value !== null && res.value !== ''){
+      const n = Number(res.value);
+      return isNaN(n) ? fallback : n;
+    }
+  }catch(e){ /* key not found yet, fine */ }
+  return fallback;
+}
+
+async function saveValue(key, num){
+  try{
+    await window.storage.set(STORAGE_PREFIX+key, String(num), false);
+  }catch(e){ console.error('storage save failed', e); }
+}
+
+async function loadValue2(key, fallback){
+  try{
+    const res = await window.storage.get(key, false);
+    if(res && res.value !== undefined && res.value !== null) return res.value;
+  }catch(e){ /* not found yet */ }
+  return fallback;
+}
+
+async function saveValue2(key, value){
+  try{
+    await window.storage.set(key, value, false);
+  }catch(e){ console.error('storage save failed', e); }
+}
+
+async function loadOrder(gridKey){
+  try{
+    const res = await window.storage.get(gridKey, false);
+    if(res && res.value) return JSON.parse(res.value);
+  }catch(e){ /* no saved order yet */ }
+  return null;
+}
+
+async function saveOrder(gridEl, gridKey){
+  const order = Array.from(gridEl.querySelectorAll('.card')).map(c=>c.dataset.name);
+  try{
+    await window.storage.set(gridKey, JSON.stringify(order), false);
+  }catch(e){ console.error('order save failed', e); }
+}
+
+const IDEA_ORDER_KEY = 'idea-order';
+const SECTION_OVERRIDES_KEY = 'venture-section-overrides';
+
+async function loadSectionOverrides(){
+  try{
+    const res = await window.storage.get(SECTION_OVERRIDES_KEY, false);
+    if(res && res.value) return JSON.parse(res.value);
+  }catch(e){ /* none yet */ }
+  return {};
+}
+
+async function saveSectionOverrides(map){
+  try{
+    await window.storage.set(SECTION_OVERRIDES_KEY, JSON.stringify(map), false);
+  }catch(e){ console.error('section override save failed', e); }
+}
+
+let sectionOverrides = {};
+
+function recomputeTotal(){
+  let realized = 0, projected = 0;
+  for(const v of ventures){
+    realized += (currentValues[v.name] || 0);
+    projected += (projectedValues[v.name] || 0);
+  }
+  totalRealizedEl.textContent = fmtMoney(realized);
+  totalProjectedEl.textContent = fmtMoney(projected);
+}
+
+const currentValues = {};
+const projectedValues = {};
+
+const ideaGrid = document.getElementById('ideaGrid');
+
+const businessIdeas = [
+  {
+    name:"Frankie — Guided Dashboard Builder", code:"IDEA · pre-launch, waitlist open", rating:0, status:"pre",
+    statusLabel:"Pre-Launch · Waitlist Open",
+    body:"A dashboard + calendar built from a guided conversation, not a template — for entrepreneurs running 3+ income streams. First 20 people get 6 months free in exchange for a 20-minute onboarding call. Modeled toward $50K ARR (see business plan).",
+    stat:{label:"Revenue ($)", defaultNum:0},
+    projected:{label:"ARR target ($)", defaultNum:50000}
+  },
+];
+
+let draggedCard = null;
+let draggedFromGrid = null;
+
+async function moveVentureAcrossSections(name, targetGridEl){
+  const fromArr = ventures.find(v=>v.name===name) ? ventures : businessIdeas;
+  const toArr = targetGridEl === grid ? ventures : businessIdeas;
+  if(fromArr === toArr) return;
+  const idx = fromArr.findIndex(v=>v.name===name);
+  if(idx === -1) return;
+  const [item] = fromArr.splice(idx, 1);
+  toArr.push(item);
+  sectionOverrides[name] = (targetGridEl === grid) ? 'active' : 'idea';
+  await saveSectionOverrides(sectionOverrides);
+}
+
+async function rerenderBothGrids(){
+  grid.innerHTML = '';
+  ideaGrid.innerHTML = '';
+  await buildCardGrid(ventures, grid);
+  await buildCardGrid(businessIdeas, ideaGrid);
+  refreshCalcVentureOptions();
+}
+
+async function buildCardGrid(list, gridEl){
+  let ordered = list;
+  const gridKey = (gridEl === grid) ? ORDER_KEY : IDEA_ORDER_KEY;
+  const savedOrder = await loadOrder(gridKey);
+  if(savedOrder){
+    const byName = Object.fromEntries(list.map(v=>[v.name,v]));
+    const reordered = savedOrder.map(n=>byName[n]).filter(Boolean);
+    const missing = list.filter(v=>!savedOrder.includes(v.name));
+    ordered = [...reordered, ...missing];
+  }
+
+  for(const v of ordered){
+    const fallback = v.stat.defaultNum !== undefined ? v.stat.defaultNum : 0;
+    const stored = await loadValue(v.name+':realized', fallback);
+    currentValues[v.name] = stored;
+    const projFallback = v.projected ? v.projected.defaultNum : 0;
+    const storedProj = await loadValue(v.name+':projected', projFallback);
+    projectedValues[v.name] = storedProj;
+
+    const dotsHtml = Array.from({length:10},(_,i)=>`<div class="dot ${i<v.rating?'on':''}"></div>`).join('');
+    const card = document.createElement('div');
+    card.className='card card-flip-outer';
+    card.draggable = true;
+    card.dataset.name = v.name;
+    const ratingDisplay = v.rating > 0 ? `${v.rating}<small>/10</small>` : `<small>unrated</small>`;
+    const taskKey = 'venture-tasks:' + v.name;
+    const storedTasks = await loadValue2(taskKey, '');
+    card.innerHTML = `
+      <div class="card-flip-inner">
+        <div class="card-face front">
+          <div class="card-top">
+            <div>
+              <div class="card-name">${v.name}</div>
+              <div class="card-code">${v.code}</div>
+            </div>
+            <div class="rating">${ratingDisplay}</div>
+          </div>
+          <div class="dots">${dotsHtml}</div>
+          <span class="badge ${v.status}">${v.statusLabel}</span>
+          <div class="card-body">${v.body}</div>
+          <div class="edit-row">
+            <label>${v.stat.label}</label>
+            <input type="number" step="1" class="value-input" data-key="${v.name}" data-kind="realized" value="${stored}">
+            <span class="saved-tick">saved</span>
+          </div>
+          <div class="edit-row">
+            <label>${v.projected ? v.projected.label : 'Projected ($)'}</label>
+            <input type="number" step="1" class="value-input" data-key="${v.name}" data-kind="projected" value="${storedProj}">
+            <span class="saved-tick">saved</span>
+          </div>
+          <div class="edit-row" style="border-top:none; justify-content:flex-end;">
+            <button type="button" class="card-flip-btn" data-flip="${v.name}">tasks &rarr;</button>
+          </div>
+        </div>
+        <div class="card-face back">
+          <div class="card-top">
+            <div class="card-name">${v.name}</div>
+            <button type="button" class="card-flip-btn" data-flip="${v.name}">&larr; back</button>
+          </div>
+          <textarea class="venture-task-input" data-taskkey="${taskKey}" placeholder="tasks for ${v.name}...">${storedTasks}</textarea>
+        </div>
+      </div>
+    `;
+    gridEl.appendChild(card);
+  }
+
+  if(gridEl === grid) recomputeTotal();
+
+  gridEl.querySelectorAll('.card-flip-btn').forEach(btn=>{
+    btn.addEventListener('click', (e)=>{
+      e.stopPropagation();
+      const card = btn.closest('.card-flip-outer');
+      card.classList.toggle('flipped');
+    });
+  });
+
+  gridEl.querySelectorAll('.venture-task-input').forEach(textarea=>{
+    textarea.addEventListener('click', (e)=>e.stopPropagation());
+    let debounceTimer;
+    textarea.addEventListener('input', ()=>{
+      clearTimeout(debounceTimer);
+      debounceTimer = setTimeout(async ()=>{
+        await saveValue2(textarea.dataset.taskkey, textarea.value);
+      }, 500);
+    });
+  });
+
+  // Prevent HTML5 drag from hijacking clicks/typing on inputs, buttons, textareas
+  gridEl.querySelectorAll('.card input, .card button, .card textarea').forEach(el=>{
+    el.addEventListener('mousedown', (e)=>e.stopPropagation());
+  });
+
+  gridEl.querySelectorAll('.value-input').forEach(input=>{
+    let debounceTimer;
+    input.addEventListener('input', ()=>{
+      clearTimeout(debounceTimer);
+      debounceTimer = setTimeout(async ()=>{
+        const key = input.dataset.key;
+        const kind = input.dataset.kind;
+        const num = Number(input.value) || 0;
+        if(kind==='realized'){
+          currentValues[key] = num;
+          await saveValue(key+':realized', num);
+        }else{
+          projectedValues[key] = num;
+          await saveValue(key+':projected', num);
+        }
+        if(gridEl === grid) recomputeTotal();
+        const tick = input.parentElement.querySelector('.saved-tick');
+        tick.classList.add('show');
+        setTimeout(()=>tick.classList.remove('show'), 1200);
+      }, 500);
+    });
+  });
+
+  // ---- Cross-grid + within-grid drag and drop ----
+  gridEl.querySelectorAll('.card').forEach(card=>{
+    card.addEventListener('dragstart', ()=>{
+      draggedCard = card;
+      draggedFromGrid = gridEl;
+      setTimeout(()=>card.classList.add('dragging'), 0);
+    });
+    card.addEventListener('dragend', async ()=>{
+      draggedCard?.classList.remove('dragging');
+      document.querySelectorAll('.card').forEach(c=>c.classList.remove('drag-over'));
+    });
+    card.addEventListener('dragover', (e)=>{
+      e.preventDefault();
+      if(card !== draggedCard) card.classList.add('drag-over');
+    });
+    card.addEventListener('dragleave', ()=>{
+      card.classList.remove('drag-over');
+    });
+    card.addEventListener('drop', async (e)=>{
+      e.preventDefault();
+      e.stopPropagation();
+      card.classList.remove('drag-over');
+      if(!draggedCard || card === draggedCard) return;
+      const name = draggedCard.dataset.name;
+      const sameGrid = draggedFromGrid === gridEl;
+      if(!sameGrid){
+        await moveVentureAcrossSections(name, gridEl);
+        await rerenderBothGrids();
+        return;
+      }
+      const cards = Array.from(gridEl.querySelectorAll('.card'));
+      const draggedIdx = cards.indexOf(draggedCard);
+      const targetIdx = cards.indexOf(card);
+      if(draggedIdx < targetIdx){ card.after(draggedCard); } else { card.before(draggedCard); }
+      await saveOrder(gridEl, gridKey);
+    });
+  });
+
+  // Allow dropping onto empty grid space (not on top of a specific card)
+  gridEl.addEventListener('dragover', (e)=>{ e.preventDefault(); });
+  gridEl.addEventListener('drop', async (e)=>{
+    if(e.target !== gridEl) return; // a card-level handler already dealt with it
+    e.preventDefault();
+    if(!draggedCard) return;
+    const name = draggedCard.dataset.name;
+    const sameGrid = draggedFromGrid === gridEl;
+    if(!sameGrid){
+      await moveVentureAcrossSections(name, gridEl);
+      await rerenderBothGrids();
+    }
+  });
+}
+
+const CUSTOM_VENTURES_KEY = 'custom-ventures';
+
+async function loadCustomVentures(){
+  try{
+    const res = await window.storage.get(CUSTOM_VENTURES_KEY, false);
+    if(res && res.value) return JSON.parse(res.value);
+  }catch(e){ /* none saved yet */ }
+  return [];
+}
+
+async function saveCustomVentures(list){
+  try{
+    await window.storage.set(CUSTOM_VENTURES_KEY, JSON.stringify(list), false);
+  }catch(e){ console.error('custom venture save failed', e); }
+}
+
+let customVentures = [];
+
+async function initVentureGrid(){
+  customVentures = await loadCustomVentures();
+  ventures.push(...customVentures);
+
+  sectionOverrides = await loadSectionOverrides();
+  for(const [name, section] of Object.entries(sectionOverrides)){
+    const inVentures = ventures.findIndex(v=>v.name===name);
+    const inIdeas = businessIdeas.findIndex(v=>v.name===name);
+    if(section === 'idea' && inVentures !== -1){
+      const [item] = ventures.splice(inVentures, 1);
+      businessIdeas.push(item);
+    } else if(section === 'active' && inIdeas !== -1){
+      const [item] = businessIdeas.splice(inIdeas, 1);
+      ventures.push(item);
+    }
+  }
+
+  await buildCardGrid(ventures, grid);
+  await buildCardGrid(businessIdeas, ideaGrid);
+}
+initVentureGrid();
+
+// ---- Add Venture ----
+const addVentureBtn = document.getElementById('addVentureBtn');
+const addVentureForm = document.getElementById('addVentureForm');
+const saveVentureBtn = document.getElementById('saveVentureBtn');
+const cancelVentureBtn = document.getElementById('cancelVentureBtn');
+const newVentureName = document.getElementById('newVentureName');
+const newVentureCode = document.getElementById('newVentureCode');
+const newVentureRating = document.getElementById('newVentureRating');
+const newVentureStatus = document.getElementById('newVentureStatus');
+const newVentureBody = document.getElementById('newVentureBody');
+
+const STATUS_LABELS = {
+  confirmed: 'Active · Confirmed Revenue',
+  pipeline: 'Built · Unconfirmed',
+  pre: 'Pre-Revenue',
+  risk: 'Unresolved · Under Review'
+};
+
+addVentureBtn.addEventListener('click', ()=>{
+  addVentureForm.style.display = addVentureForm.style.display === 'none' ? 'block' : 'none';
+});
+cancelVentureBtn.addEventListener('click', ()=>{
+  addVentureForm.style.display = 'none';
+  newVentureName.value = ''; newVentureCode.value = ''; newVentureRating.value = 5;
+  newVentureStatus.value = 'confirmed'; newVentureBody.value = '';
+});
+saveVentureBtn.addEventListener('click', async ()=>{
+  const name = newVentureName.value.trim();
+  if(!name) { newVentureName.focus(); return; }
+  const status = newVentureStatus.value;
+  const newVenture = {
+    name,
+    code: newVentureCode.value.trim() || 'custom venture',
+    rating: Number(newVentureRating.value) || 0,
+    status,
+    statusLabel: STATUS_LABELS[status],
+    body: newVentureBody.value.trim() || 'No description yet.',
+    stat: {label:'Revenue ($)', defaultNum:0},
+    projected: {label:'Projected ($)', defaultNum:0}
+  };
+  ventures.push(newVenture);
+  customVentures.push(newVenture);
+  await saveCustomVentures(customVentures);
+  grid.innerHTML = '';
+  await buildCardGrid(ventures, grid);
+  refreshCalcVentureOptions();
+  addVentureForm.style.display = 'none';
+  newVentureName.value = ''; newVentureCode.value = ''; newVentureRating.value = 5;
+  newVentureStatus.value = 'confirmed'; newVentureBody.value = '';
+});
+
+// ---- Contacts ----
+const CONTACTS_KEY = 'frankie-contacts';
+const contactForm = document.getElementById('contactForm');
+const contactName = document.getElementById('contactName');
+const contactTag = document.getElementById('contactTag');
+const contactVenture = document.getElementById('contactVenture');
+const contactNotes = document.getElementById('contactNotes');
+const contactList = document.getElementById('contactList');
+
+// Populate venture dropdown from real venture + idea names
+[...ventures, ...businessIdeas].forEach(v=>{
+  const opt = document.createElement('option');
+  opt.value = v.name;
+  opt.textContent = v.name;
+  contactVenture.appendChild(opt);
+});
+
+let contacts = [];
+
+function renderContacts(){
+  contactList.innerHTML = '';
+  if(contacts.length === 0){
+    contactList.innerHTML = '<div class="contact-empty">No contacts yet — add your first above.</div>';
+    return;
+  }
+  contacts.forEach((c, idx)=>{
+    const row = document.createElement('div');
+    row.className = 'contact-row';
+    row.innerHTML = `
+      <span class="c-name">${c.name}</span>
+      ${c.tag ? `<span class="c-tag">${c.tag}</span>` : ''}
+      ${c.venture ? `<span class="c-venture">${c.venture}</span>` : ''}
+      <span class="c-notes">${c.notes || ''}</span>
+      <button class="c-del" data-idx="${idx}">REMOVE</button>
+    `;
+    contactList.appendChild(row);
+  });
+  contactList.querySelectorAll('.c-del').forEach(btn=>{
+    btn.addEventListener('click', async ()=>{
+      contacts.splice(Number(btn.dataset.idx), 1);
+      await saveContacts();
+      renderContacts();
+    });
+  });
+}
+
+async function loadContacts(){
+  try{
+    const res = await window.storage.get(CONTACTS_KEY, false);
+    if(res && res.value) contacts = JSON.parse(res.value);
+  }catch(e){ contacts = []; }
+  renderContacts();
+}
+
+async function saveContacts(){
+  try{
+    await window.storage.set(CONTACTS_KEY, JSON.stringify(contacts), false);
+  }catch(e){ console.error('contact save failed', e); }
+}
+
+contactForm.addEventListener('submit', async (e)=>{
+  e.preventDefault();
+  const name = contactName.value.trim();
+  if(!name) return;
+  contacts.push({
+    name,
+    tag: contactTag.value.trim(),
+    venture: contactVenture.value,
+    notes: contactNotes.value.trim()
+  });
+  await saveContacts();
+  renderContacts();
+  contactForm.reset();
+  contactName.focus();
+});
+
+loadContacts();
+
+// ---- Deal Tracker ----
+const DEALS_KEY = 'frankie-deals';
+const dealForm = document.getElementById('dealForm');
+const dealName = document.getElementById('dealName');
+const dealType = document.getElementById('dealType');
+const dealAmount = document.getElementById('dealAmount');
+const dealStatus = document.getElementById('dealStatus');
+const dealTerms = document.getElementById('dealTerms');
+const dealNotes = document.getElementById('dealNotes');
+const dealList = document.getElementById('dealList');
+
+const DEAL_STATUS_CLASS = {
+  'Evaluating': 'pipeline',
+  'Active': 'confirmed',
+  'Closed': 'confirmed',
+  'Declined / Passed': 'risk'
+};
+
+let deals = [];
+
+function renderDeals(){
+  dealList.innerHTML = '';
+  if(deals.length === 0){
+    dealList.innerHTML = '<div class="contact-empty">No deals tracked yet — add your first above.</div>';
+    return;
+  }
+  deals.forEach((d, idx)=>{
+    const row = document.createElement('div');
+    row.className = 'contact-row';
+    const statusClass = DEAL_STATUS_CLASS[d.status] || 'pre';
+    row.innerHTML = `
+      <span class="c-name">${d.name}</span>
+      <span class="c-tag">${d.type}</span>
+      <span class="badge ${statusClass}" style="width:auto;">${d.status}</span>
+      ${d.amount ? `<span class="c-venture">$${Number(d.amount).toLocaleString()}</span>` : ''}
+      ${d.terms ? `<span class="c-venture">${d.terms}</span>` : ''}
+      <span class="c-notes">${d.notes || ''}</span>
+      <button class="c-del" data-idx="${idx}">REMOVE</button>
+    `;
+    dealList.appendChild(row);
+  });
+  dealList.querySelectorAll('.c-del').forEach(btn=>{
+    btn.addEventListener('click', async ()=>{
+      deals.splice(Number(btn.dataset.idx), 1);
+      await saveDeals();
+      renderDeals();
+    });
+  });
+}
+
+async function loadDeals(){
+  try{
+    const res = await window.storage.get(DEALS_KEY, false);
+    if(res && res.value) deals = JSON.parse(res.value);
+  }catch(e){ deals = []; }
+  renderDeals();
+}
+
+async function saveDeals(){
+  try{
+    await window.storage.set(DEALS_KEY, JSON.stringify(deals), false);
+  }catch(e){ console.error('deal save failed', e); }
+}
+
+dealForm.addEventListener('submit', async (e)=>{
+  e.preventDefault();
+  const name = dealName.value.trim();
+  if(!name) return;
+  deals.push({
+    name,
+    type: dealType.value,
+    amount: dealAmount.value.trim(),
+    status: dealStatus.value,
+    terms: dealTerms.value.trim(),
+    notes: dealNotes.value.trim()
+  });
+  await saveDeals();
+  renderDeals();
+  dealForm.reset();
+  dealName.focus();
+});
+
+loadDeals();
+
+// ---- Revenue calculator ----
+const calcAmount = document.getElementById('calcAmount');
+const calcRate = document.getElementById('calcRate');
+const calcResult = document.getElementById('calcResult');
+const calcVentureSelect = document.getElementById('calcVentureSelect');
+const calcFieldSelect = document.getElementById('calcFieldSelect');
+const calcApplyBtn = document.getElementById('calcApplyBtn');
+const calcApplyStatus = document.getElementById('calcApplyStatus');
+
+function refreshCalcVentureOptions(){
+  const current = calcVentureSelect.value;
+  calcVentureSelect.innerHTML = '';
+  [...ventures, ...businessIdeas].forEach(v=>{
+    const opt = document.createElement('option');
+    opt.value = v.name;
+    opt.textContent = v.name;
+    calcVentureSelect.appendChild(opt);
+  });
+  if(current) calcVentureSelect.value = current;
+}
+refreshCalcVentureOptions();
+
+function updateCalc(){
+  const amt = Number(calcAmount.value) || 0;
+  const rate = Number(calcRate.value) || 0;
+  calcResult.textContent = fmtMoney(amt * (rate/100));
+}
+calcAmount.addEventListener('input', updateCalc);
+calcRate.addEventListener('input', updateCalc);
+updateCalc();
+
+calcApplyBtn.addEventListener('click', ()=>{
+  const amt = Number(calcAmount.value) || 0;
+  const rate = Number(calcRate.value) || 0;
+  const value = Math.round(amt * (rate/100));
+  const ventureName = calcVentureSelect.value;
+  const kind = calcFieldSelect.value;
+  if(!ventureName){ return; }
+
+  const targetInput = document.querySelector(
+    `.value-input[data-key="${CSS.escape(ventureName)}"][data-kind="${kind}"]`
+  );
+  if(!targetInput){
+    calcApplyStatus.textContent = 'Venture card not found on this page.';
+    calcApplyStatus.style.color = 'var(--red)';
+    return;
+  }
+  targetInput.value = value;
+  targetInput.dispatchEvent(new Event('input', { bubbles: true }));
+  calcApplyStatus.textContent = `Added $${value.toLocaleString()} to ${ventureName}`;
+  calcApplyStatus.style.color = 'var(--green)';
+  setTimeout(()=>{ calcApplyStatus.textContent = ''; }, 2500);
+});
+
+// ---- Tasks flip card ----
+const tasksCard = document.getElementById('tasksCard');
+const taskInput = document.getElementById('taskInput');
+const taskCount = document.getElementById('taskCount');
+const TASKS_KEY = 'frankie-tasks';
+
+function updateTaskCount(){
+  const lines = taskInput.value.split('\n').map(l=>l.trim()).filter(Boolean);
+  taskCount.textContent = lines.length + (lines.length===1?' item':' items');
+}
+
+(async ()=>{
+  try{
+    const res = await window.storage.get(TASKS_KEY, false);
+    if(res && res.value !== undefined) taskInput.value = res.value;
+  }catch(e){ /* nothing saved yet */ }
+  updateTaskCount();
+})();
+
+tasksCard.addEventListener('click', ()=>{
+  tasksCard.classList.toggle('flipped');
+});
+
+let taskSaveTimer;
+taskInput.addEventListener('input', ()=>{
+  updateTaskCount();
+  clearTimeout(taskSaveTimer);
+  taskSaveTimer = setTimeout(async ()=>{
+    try{ await window.storage.set(TASKS_KEY, taskInput.value, false); }
+    catch(e){ console.error('task save failed', e); }
+  }, 500);
+});
+
+// Ticker strip content (duplicated for seamless loop)
+const tickerData = ventures.map(v=>{
+  let cls = 'flat';
+  if(v.status==='confirmed') cls='up';
+  if(v.status==='risk') cls='down';
+  const shortCode = v.code.split(' ')[0].replace('·','').trim();
+  return {sym:shortCode, val:`${v.rating}/10`, cls};
+});
+const track = document.getElementById('tickerTrack');
+const buildTicks = () => tickerData.map(t=>`<div class="tick ${t.cls}"><span class="sym">${t.sym}</span><span class="val">${t.val}</span></div>`).join('');
+track.innerHTML = buildTicks() + buildTicks();
+
+// Calendar for July 2026
+const calGrid = document.getElementById('calGrid');
+const dows = ['S','M','T','W','T','F','S'];
+dows.forEach(d=>{
+  const el = document.createElement('div');
+  el.className='cal-dow';
+  el.textContent=d;
+  calGrid.appendChild(el);
+});
+const year=2026, month=6; // July = index 6
+const firstDay = new Date(year, month, 1).getDay();
+const daysInMonth = new Date(year, month+1, 0).getDate();
+const today = 9;
+for(let i=0;i<firstDay;i++){
+  const el=document.createElement('div');
+  el.className='cal-day empty';
+  calGrid.appendChild(el);
+}
+for(let d=1; d<=daysInMonth; d++){
+  const el=document.createElement('div');
+  el.className='cal-day'+(d===today?' today':'');
+  el.textContent=d;
+  calGrid.appendChild(el);
+}
+
+// Open items
+const items = [
+  {tag:"ZGM Loan", risk:true, text:"Get attorney review of Shonn's final docs before any funds move — <b>securities characterization</b> is the live concern."},
+  {tag:"ZGM Loan", risk:true, text:"Still unanswered: does the $20K obligation survive if the assigned location closes, or is it tied only to that location?"},
+  {tag:"ZGM Loan", risk:false, text:"Request the specific location's real financials (bank statements / tax returns) — the July report was company-wide, not location-level."},
+  {tag:"Roofing Collections", risk:false, text:"Complete Oregon ORS 697 collection agency registration + post $10-15K surety bond before operating."},
+  {tag:"ES Futures", risk:false, text:"Navigate the 20% consistency rule across funded accounts toward first payout eligibility."},
+];
+const itemsList = document.getElementById('itemsList');
+items.forEach(it=>{
+  const li=document.createElement('li');
+  li.className='item'+(it.risk?' risk':'');
+  li.innerHTML = `<div class="item-text"><span class="item-tag">${it.tag}</span>${it.text}</div>`;
+  itemsList.appendChild(li);
+});
+
+// ---- Frankie Terminal (LLM grounded in the portfolio data above) ----
+const portfolioContext = JSON.stringify(ventures, null, 2);
+const openItemsContext = JSON.stringify(items, null, 2);
+
+const systemPrompt = `You are "Frankie" — a direct, money-focused, no-fluff terminal assistant embedded in Fanny's personal venture dashboard. You are NOT a general chatbot; you answer questions ONLY about the ventures and open items listed below, which is the sum total of what you know.
+
+Hard rules:
+- Only use the data provided below. Do not invent numbers, dates, deadlines, or facts not present here.
+- If asked something not covered by this data (e.g. "what's HOOD trading at right now", "what should I do next month"), say plainly that you don't have that information rather than guessing.
+- Never state assumptions as fact. Flag them as assumptions if you make any.
+- Keep answers tight and factual — no filler, no motivational language, no unsolicited opinions unless asked.
+- This snapshot is dated July 9, 2026 and is NOT live data.
+
+VENTURE DATA:
+${portfolioContext}
+
+OPEN ITEMS:
+${openItemsContext}`;
+
+const chatLog = document.getElementById('chatLog');
+const chatForm = document.getElementById('chatForm');
+const chatInput = document.getElementById('chatInput');
+const sendBtn = chatForm.querySelector('.chat-send');
+
+let history = [];
+
+function addMsg(who, text, cls){
+  const div = document.createElement('div');
+  div.className = 'msg ' + cls;
+  div.innerHTML = `<span class="who">${who}${who ? ':' : ''}</span><span class="body"></span>`;
+  div.querySelector('.body').textContent = text;
+  chatLog.appendChild(div);
+  chatLog.scrollTop = chatLog.scrollHeight;
+  return div;
+}
+
+addMsg('FRANKIE', "Ask me about your positions, ratings, or open items. I only know what's on this page — nothing live.", 'assistant');
+
+chatForm.addEventListener('submit', async (e)=>{
+  e.preventDefault();
+  const q = chatInput.value.trim();
+  if(!q) return;
+  addMsg('YOU', q, 'user');
+  history.push({role:'user', content:q});
+  chatInput.value='';
+  sendBtn.disabled = true;
+  const pending = addMsg('FRANKIE', 'thinking...', 'assistant pending');
+
+  try{
+    const resp = await fetch('https://api.anthropic.com/v1/messages', {
+      method:'POST',
+      headers:{'Content-Type':'application/json'},
+      body: JSON.stringify({
+        model:'claude-sonnet-4-6',
+        max_tokens:600,
+        system: systemPrompt,
+        messages: history
+      })
+    });
+
+    const raw = await resp.text();
+    let data;
+    try{
+      data = JSON.parse(raw);
+    }catch(parseErr){
+      throw new Error('Non-JSON response (status '+resp.status+'): '+raw.slice(0,200));
+    }
+
+    if(!resp.ok){
+      const msg = (data && data.error && data.error.message) ? data.error.message : JSON.stringify(data);
+      throw new Error('API error (status '+resp.status+'): '+msg);
+    }
+
+    const textBlocks = (data.content||[]).filter(b=>b.type==='text').map(b=>b.text);
+    const answer = textBlocks.join('\n').trim() || "No response returned.";
+    pending.remove();
+    addMsg('FRANKIE', answer, 'assistant');
+    history.push({role:'assistant', content:answer});
+  }catch(err){
+    pending.remove();
+    addMsg('FRANKIE', 'Error: ' + err.message, 'assistant');
+    console.error(err);
+  }finally{
+    sendBtn.disabled = false;
+    chatInput.focus();
+  }
+});
+</script>
+</body>
+</html>
