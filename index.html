@@ -37,7 +37,7 @@
   }
   .wrap{max-width:1300px;margin:0 auto;padding:20px 20px 40px;}
 
-  /* ---- Ticker strip (signature element) ---- */
+  /* ---- Ticker strip ---- */
   .ticker-outer{
     background:var(--surface);
     border:1px solid var(--border);
@@ -114,7 +114,7 @@
     content:''; flex:1; height:1px; background:var(--border);
   }
 
-  /* ---- Cards grid ---- */
+  /* ---- Cards grid (Business Ideas keeps this layout) ---- */
   .grid{
     display:grid;
     grid-template-columns:repeat(4, minmax(0,1fr));
@@ -377,13 +377,13 @@
   }
   .tasks-face textarea:focus{outline:none; border-color:var(--gold-dim);}
 
-  /* ---- Draggable cards ---- */
+  /* ---- Draggable business-idea cards ---- */
   .card{cursor:grab;}
   .card:active{cursor:grabbing;}
   .card.dragging{opacity:0.4;}
   .card.drag-over{border-color:var(--gold); border-style:dashed;}
 
-  .add-venture-row{margin-bottom:12px;}
+  .add-venture-row{margin-bottom:12px; display:flex; gap:10px; align-items:center; flex-wrap:wrap;}
   .add-venture-btn{
     background:var(--gold); color:#100D02; border:none; border-radius:6px;
     padding:9px 16px; font-family:'IBM Plex Mono',monospace; font-weight:700;
@@ -409,7 +409,7 @@
   .add-venture-form input:focus, .add-venture-form select:focus{outline:none; border-color:var(--gold-dim);}
   .add-venture-actions{margin-top:14px;}
 
-  /* ---- Per-venture card flip for tasks ---- */
+  /* ---- Per-venture card flip for tasks (business ideas grid) ---- */
   .card-flip-outer{perspective:1000px;}
   .card-flip-inner{
     position:relative; width:100%; height:100%;
@@ -533,6 +533,115 @@
   .contact-row .c-del:hover{border-color:var(--red); color:var(--red);}
   .contact-empty{font-family:'IBM Plex Mono',monospace; font-size:12px; color:var(--muted); text-align:center; padding:20px 0;}
 
+  /* ---- Heatmap (treemap) for Active Positions ---- */
+  .heatmap-outer{
+    position:relative;
+    width:100%;
+    height:460px;
+    background:var(--bg);
+    border-radius:10px;
+    overflow:hidden;
+  }
+  @media(max-width:600px){ .heatmap-outer{height:620px;} }
+  .heat-tile{
+    position:absolute;
+    border:2px solid var(--bg);
+    border-radius:6px;
+    padding:10px;
+    overflow:hidden;
+    box-sizing:border-box;
+    display:flex; flex-direction:column;
+    justify-content:space-between;
+    cursor:pointer;
+    transition:filter .15s ease, transform .15s ease;
+  }
+  .heat-tile:hover{filter:brightness(1.15); z-index:5;}
+  .heat-tile.confirmed{background:linear-gradient(135deg,#1c5c47,#134334);}
+  .heat-tile.pipeline{background:linear-gradient(135deg,#6b551d,#4d3d15);}
+  .heat-tile.pre{background:linear-gradient(135deg,#2b313d,#1e222b);}
+  .heat-tile.risk{background:linear-gradient(135deg,#7a2b2d,#571e20);}
+  .heat-name{
+    font-family:'Space Grotesk',sans-serif; font-weight:700; color:#fff;
+    line-height:1.2; overflow:hidden; text-overflow:ellipsis;
+    display:-webkit-box; -webkit-line-clamp:2; -webkit-box-orient:vertical;
+  }
+  .heat-sub{
+    font-family:'IBM Plex Mono',monospace; color:rgba(255,255,255,0.65);
+    overflow:hidden; text-overflow:ellipsis; white-space:nowrap;
+  }
+  .heat-value{
+    font-family:'IBM Plex Mono',monospace; font-weight:600; color:#fff;
+  }
+  .heat-tile.expanded{
+    position:fixed; z-index:100;
+    top:50%; left:50%; transform:translate(-50%,-50%);
+    width:min(520px,90vw); height:auto; max-height:80vh; overflow-y:auto;
+    box-shadow:0 20px 60px rgba(0,0,0,0.6);
+    border-color:var(--gold-dim);
+  }
+  .heat-tile.expanded .heat-name{-webkit-line-clamp:unset;}
+  .heat-backdrop{
+    position:fixed; inset:0; background:rgba(0,0,0,0.55); z-index:90; display:none;
+  }
+  .heat-backdrop.show{display:block;}
+  .heat-body{
+    font-size:11.5px; color:rgba(255,255,255,0.8); line-height:1.5; margin-top:8px;
+  }
+  .heat-body b{color:#fff;}
+  .heat-tile.expanded .edit-row{border-top-color:rgba(255,255,255,0.15);}
+  .heat-tile.expanded .edit-row label{color:rgba(255,255,255,0.6);}
+  .heat-tile.expanded .edit-row input{background:rgba(0,0,0,0.3); color:#fff; border-color:rgba(255,255,255,0.2);}
+  .heat-tile.expanded .card-flip-btn{border-color:rgba(255,255,255,0.3); color:rgba(255,255,255,0.8);}
+  .heat-legend{
+    display:flex; gap:16px; flex-wrap:wrap; margin-bottom:10px;
+    font-family:'IBM Plex Mono',monospace; font-size:10.5px; color:var(--muted);
+  }
+  .heat-legend span{display:flex; align-items:center; gap:5px;}
+  .heat-legend i{width:9px;height:9px;border-radius:2px;display:inline-block;}
+  .heat-legend i.confirmed{background:#1c5c47;}
+  .heat-legend i.pipeline{background:#6b551d;}
+  .heat-legend i.pre{background:#2b313d; border:1px solid #444;}
+  .heat-legend i.risk{background:#7a2b2d;}
+
+  .bs-panel{margin-top:0;}
+  .bs-group{margin-bottom:22px;}
+  .bs-group-title{
+    font-family:'IBM Plex Mono',monospace; font-size:11px; letter-spacing:0.1em;
+    color:var(--gold); text-transform:uppercase; margin-bottom:8px;
+    display:flex; align-items:center; gap:8px;
+  }
+  .bs-group-title::after{content:''; flex:1; height:1px; background:var(--border);}
+  .bs-row{
+    display:flex; justify-content:space-between; align-items:center;
+    padding:7px 0; border-bottom:1px solid var(--border);
+    font-size:12.5px; gap:10px;
+  }
+  .bs-row:last-child{border-bottom:none;}
+  .bs-row .bs-name{color:var(--text);}
+  .bs-row .bs-sub{color:var(--muted); font-size:10.5px; display:block;}
+  .bs-row input{
+    background:var(--surface-alt); border:1px solid var(--border); border-radius:5px;
+    padding:5px 8px; color:var(--gold); font-family:'IBM Plex Mono',monospace;
+    font-size:12.5px; text-align:right; width:140px;
+  }
+  .bs-row input:focus{outline:none; border-color:var(--gold-dim);}
+  .bs-total-row{
+    display:flex; justify-content:space-between; font-family:'IBM Plex Mono',monospace;
+    font-weight:600; font-size:14px; padding-top:8px; margin-top:4px;
+    border-top:1px solid var(--gold-dim); color:var(--gold);
+  }
+  .bs-grid{display:grid; grid-template-columns:1fr 1fr; gap:20px;}
+  @media(max-width:820px){ .bs-grid{grid-template-columns:1fr;} }
+  .bs-networth-bar{
+    background:linear-gradient(180deg, var(--surface) 0%, var(--surface-alt) 100%);
+    border:1px solid var(--gold-dim); border-radius:10px; padding:18px 22px;
+    display:flex; align-items:baseline; gap:14px; margin-bottom:18px; flex-wrap:wrap;
+  }
+  .bs-networth-bar .total-label{font-family:'IBM Plex Mono',monospace; font-size:11px; letter-spacing:.1em; color:var(--gold); text-transform:uppercase;}
+  .bs-networth-bar .total-value{font-family:'Space Grotesk',sans-serif; font-size:30px; font-weight:700;}
+  .bs-networth-bar .total-sub{font-family:'IBM Plex Mono',monospace; font-size:10.5px; color:var(--muted); margin-left:auto;}
+  .bs-note{font-family:'IBM Plex Mono',monospace; font-size:10px; color:var(--muted); margin-top:-2px; margin-bottom:10px;}
+
   footer{
     margin-top:36px;
     font-family:'IBM Plex Mono',monospace;
@@ -557,15 +666,61 @@
       <div class="subtitle">venture portfolio — Newberg, OR</div>
     </div>
     <div class="asof">
-      SNAPSHOT — JUL 09 2026<br>
+      SNAPSHOT — JUL 12 2026<br>
       built from conversation history<br>
       not live data · not financial advice
     </div>
   </header>
 
-  <div class="section-label">Active Positions</div>
+  <div class="total-split">
+    <div class="total-bar" id="totalBar">
+      <div class="total-label">Realized</div>
+      <div class="total-value" id="totalRealized">$0</div>
+      <div class="total-sub">confirmed / in-hand</div>
+    </div>
+    <div class="total-bar projected" id="totalBarProjected">
+      <div class="total-label">Projected</div>
+      <div class="total-value" id="totalProjected">$0</div>
+      <div class="total-sub">potential / pipeline</div>
+    </div>
+  </div>
 
-  <div class="main-layout">
+  <div class="section-label">Active Positions <span style="font-weight:400;text-transform:none;">(tile size = realized + projected value)</span></div>
+  <div class="add-venture-row">
+    <button id="addVentureBtn" class="add-venture-btn">+ Add Venture</button>
+  </div>
+  <div class="panel add-venture-form" id="addVentureForm" style="display:none;">
+    <label>Name</label>
+    <input type="text" id="newVentureName" placeholder="e.g. New Consulting Client">
+    <label>Code / Category</label>
+    <input type="text" id="newVentureCode" placeholder="e.g. consulting, retainer">
+    <label>Rating (0-10)</label>
+    <input type="number" id="newVentureRating" min="0" max="10" value="5">
+    <label>Status</label>
+    <select id="newVentureStatus">
+      <option value="confirmed">Confirmed / Active</option>
+      <option value="pipeline">Pipeline / Building</option>
+      <option value="pre">Pre-Revenue</option>
+      <option value="risk">Risk / Under Review</option>
+    </select>
+    <label>Description</label>
+    <input type="text" id="newVentureBody" placeholder="Short description">
+    <div class="add-venture-actions">
+      <button id="saveVentureBtn" class="add-venture-btn">Save</button>
+      <button id="cancelVentureBtn" class="add-venture-cancel">Cancel</button>
+    </div>
+  </div>
+
+  <div class="heat-legend">
+    <span><i class="confirmed"></i>Confirmed / Active</span>
+    <span><i class="pipeline"></i>Pipeline / Building</span>
+    <span><i class="pre"></i>Pre-Revenue</span>
+    <span><i class="risk"></i>Risk / Under Review</span>
+  </div>
+  <div class="heatmap-outer" id="heatmapOuter"></div>
+  <div class="heat-backdrop" id="heatBackdrop"></div>
+
+  <div class="main-layout" style="margin-top:20px;">
     <aside class="sidebar">
       <div class="panel calc-panel">
         <div class="panel-title">Revenue Calculator</div>
@@ -605,50 +760,93 @@
     </aside>
 
     <div class="main-col">
-      <div class="total-split">
-        <div class="total-bar" id="totalBar">
-          <div class="total-label">Realized</div>
-          <div class="total-value" id="totalRealized">$0</div>
-          <div class="total-sub">confirmed / in-hand</div>
-        </div>
-        <div class="total-bar projected" id="totalBarProjected">
-          <div class="total-label">Projected</div>
-          <div class="total-value" id="totalProjected">$0</div>
-          <div class="total-sub">potential / pipeline</div>
-        </div>
-      </div>
-
-      <div class="add-venture-row">
-        <button id="addVentureBtn" class="add-venture-btn">+ Add Venture</button>
-      </div>
-      <div class="panel add-venture-form" id="addVentureForm" style="display:none;">
-        <label>Name</label>
-        <input type="text" id="newVentureName" placeholder="e.g. New Consulting Client">
-        <label>Code / Category</label>
-        <input type="text" id="newVentureCode" placeholder="e.g. consulting, retainer">
-        <label>Rating (0-10)</label>
-        <input type="number" id="newVentureRating" min="0" max="10" value="5">
-        <label>Status</label>
-        <select id="newVentureStatus">
-          <option value="confirmed">Confirmed / Active</option>
-          <option value="pipeline">Pipeline / Building</option>
-          <option value="pre">Pre-Revenue</option>
-          <option value="risk">Risk / Under Review</option>
-        </select>
-        <label>Description</label>
-        <input type="text" id="newVentureBody" placeholder="Short description">
-        <div class="add-venture-actions">
-          <button id="saveVentureBtn" class="add-venture-btn">Save</button>
-          <button id="cancelVentureBtn" class="add-venture-cancel">Cancel</button>
-        </div>
-      </div>
-
-      <div class="grid" id="cardGrid"></div>
+      <div class="section-label">Business Ideas <span style="font-weight:400;text-transform:none;">(pre-launch, not counted in totals above)</span></div>
+      <div class="grid" id="ideaGrid"></div>
     </div>
   </div>
 
-  <div class="section-label">Business Ideas <span style="font-weight:400;text-transform:none;">(pre-launch, not counted in totals above)</span></div>
-  <div class="grid" id="ideaGrid"></div>
+  <div class="section-label">Personal Balance Sheet <span style="font-weight:400;text-transform:none;" id="bsUpdated">last updated Jul 12 2026</span></div>
+  <div class="panel bs-panel">
+    <div class="bs-networth-bar">
+      <div class="total-label">Total Personal Assets</div>
+      <div class="total-value" id="bsTotalAssets">$0</div>
+      <div class="total-sub" id="bsTotalAssetsSub"></div>
+    </div>
+    <div class="bs-note">Managed Assets and Joint Ventures are tracked separately below and are NOT included in Total Personal Assets.</div>
+
+    <div class="bs-grid">
+      <div>
+        <div class="bs-group">
+          <div class="bs-group-title">Cash</div>
+          <div id="bsCashRows"></div>
+          <div class="bs-total-row"><span>Total Cash</span><span id="bsCashTotal">$0</span></div>
+        </div>
+
+        <div class="bs-group">
+          <div class="bs-group-title">Public Investments</div>
+          <div id="bsPublicRows"></div>
+          <div class="bs-total-row"><span>Total Public Investments</span><span id="bsPublicTotal">$0</span></div>
+        </div>
+
+        <div class="bs-group">
+          <div class="bs-group-title">Private Investments</div>
+          <div id="bsPrivateRows"></div>
+          <div class="bs-total-row"><span>Total Private Investments</span><span id="bsPrivateTotal">$0</span></div>
+        </div>
+
+        <div class="bs-group">
+          <div class="bs-group-title">Real Estate</div>
+          <div id="bsRealEstateRows"></div>
+          <div class="bs-total-row"><span>Total Real Estate</span><span id="bsRealEstateTotal">$0</span></div>
+        </div>
+      </div>
+
+      <div>
+        <div class="bs-group">
+          <div class="bs-group-title">Managed Assets <span style="font-weight:400;">(not personal net worth)</span></div>
+          <div id="bsManagedRows"></div>
+          <div class="bs-total-row"><span>Total Managed Assets</span><span id="bsManagedTotal">$0</span></div>
+        </div>
+
+        <div class="bs-group">
+          <div class="bs-group-title">Joint Ventures <span style="font-weight:400;">(track separately)</span></div>
+          <div id="bsJointRows"></div>
+        </div>
+
+        <div class="bs-group">
+          <div class="bs-group-title">Liabilities</div>
+          <div id="bsLiabilityRows"></div>
+          <div class="bs-total-row" style="color:var(--red); border-top-color:var(--red);"><span>Total Liabilities (cards only — HELOC/Mortgage TBD)</span><span id="bsLiabilityTotal">$0</span></div>
+        </div>
+
+        <div class="bs-group">
+          <div class="bs-group-title">Income — SecureBags</div>
+          <div class="bs-row"><span class="bs-name">Commission Rate<span class="bs-sub">8% · paid 3rd business day, prior month's sales</span></span><span style="font-family:'IBM Plex Mono',monospace;">8%</span></div>
+          <div id="bsIncomeRows"></div>
+
+          <div class="calc-result" style="margin-top:14px; text-align:left; padding:14px;">
+            <label style="font-family:'IBM Plex Mono',monospace; font-size:10px; color:var(--muted); text-transform:uppercase; letter-spacing:.05em; display:block; margin-bottom:6px;">Quick Commission Calc</label>
+            <div style="display:flex; gap:8px; align-items:center; flex-wrap:wrap;">
+              <input type="number" id="incCalcAmount" placeholder="deal amount $" style="flex:1; min-width:110px; background:var(--surface-alt); border:1px solid var(--border); border-radius:5px; padding:6px 8px; color:var(--text); font-family:'IBM Plex Mono',monospace; font-size:12px;">
+              <span style="font-family:'IBM Plex Mono',monospace; font-size:12px; color:var(--muted);">&times; 8% =</span>
+              <span id="incCalcResult" style="font-family:'IBM Plex Mono',monospace; font-weight:600; color:var(--gold); font-size:14px;">$0</span>
+            </div>
+            <div style="display:flex; gap:8px; margin-top:10px; flex-wrap:wrap;">
+              <select id="incCalcTarget" style="flex:1; min-width:160px; background:var(--surface-alt); border:1px solid var(--border); border-radius:5px; padding:6px 8px; color:var(--text); font-family:'IBM Plex Mono',monospace; font-size:11.5px;">
+                <option value="julySalesClosed">Add deal $ to July Sales Closed</option>
+                <option value="juneCommission">Add commission $ to June Commission</option>
+                <option value="expectedAugustCommission">Add commission $ to Expected August Commission</option>
+                <option value="lifetimeClosedRevenue">Add deal $ to Lifetime Closed Revenue</option>
+                <option value="lifetimeCommissionEarned">Add commission $ to Lifetime Commission Earned</option>
+              </select>
+              <button type="button" id="incCalcApplyBtn" class="add-venture-btn">Add</button>
+            </div>
+            <div id="incCalcStatus" style="font-family:'IBM Plex Mono',monospace; font-size:10.5px; color:var(--green); margin-top:6px; height:14px;"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
 
   <div class="section-label">Contacts</div>
   <div class="panel" id="contactsPanel">
@@ -712,7 +910,7 @@
   <div class="section-label">Frankie Terminal</div>
   <div class="panel" id="terminalPanel">
     <div class="panel-title">Ask Frankie</div>
-    <div class="panel-sub">grounded only in the portfolio data on this page — will say so if it doesn't know something</div>
+    <div class="panel-sub">grounded only in the portfolio data on this page — not wired to a live model yet</div>
     <div id="chatLog" class="chat-log"></div>
     <form id="chatForm" class="chat-form">
       <span class="prompt-caret">&gt;</span>
@@ -729,11 +927,10 @@
 </div>
 
 <script>
-// ---- Real persistence via Supabase (replaces Claude-artifact-only window.storage) ----
+// ---- Real persistence via Supabase ----
 const SUPABASE_URL = 'https://vdtbxzjuxckwuzzhrjga.supabase.co';
 const SUPABASE_KEY = 'sb_publishable_9gu5tAC9TRSfnlNeY5VThQ_y5w_lAUV';
 
-// Visible error banner so failures show on-screen without needing dev tools
 const debugBanner = document.createElement('div');
 debugBanner.style.cssText = 'position:fixed;top:0;left:0;right:0;background:#B23B36;color:#fff;font-family:monospace;font-size:12px;padding:8px 14px;z-index:9999;display:none;';
 document.body.appendChild(debugBanner);
@@ -844,7 +1041,7 @@ const ventures = [
   {
     name:"LEAP Diagonal Spreads", code:"$NOW $140C · HOOD $85C · Jan 2028", rating:6, status:"confirmed",
     statusLabel:"Unrealized Gain",
-    body:"3x $NOW + 3x HOOD LEAP calls, cost basis $23,820. Was ~$1,800 underwater at Jun 8 snapshot. Per your latest update: up ~$6,000 on cost basis (~25.2%), before separate short-call premium collected.",
+    body:"3x $NOW + 3x HOOD LEAP calls, cost basis $23,820. Per your latest update: up ~$6,000 on cost basis (~25.2%), before separate short-call premium collected.",
     stat:{label:"Unrealized gain ($)", defaultNum:6000},
     projected:{label:"Projected at expiry ($)", defaultNum:0}
   },
@@ -865,17 +1062,25 @@ const ventures = [
   {
     name:"Zero Gravity Massage Loan", code:"ZGM · Shonn Piersol deal", rating:2, status:"risk",
     statusLabel:"Unresolved · Do Not Fund",
-    body:"$10K in &rarr; $20K over 36mo via profit-participation on one new location. Open: possible unregistered-securities structure, unclear entity liability if location closes, financials still unverified (mgmt estimates only), partner-split criteria unexplained.",
+    body:"$10K in &rarr; $20K over 36mo via profit-participation on one new location. Open: possible unregistered-securities structure, unclear entity liability if location closes, financials still unverified (mgmt estimates only).",
     stat:{label:"Funds committed ($)", defaultNum:0},
     projected:{label:"Projected return ($)", defaultNum:0}
   },
 ];
 
-const grid = document.getElementById('cardGrid');
+const businessIdeas = [
+  {
+    name:"Frankie — Guided Dashboard Builder", code:"IDEA · pre-launch, waitlist open", rating:0, status:"pre",
+    statusLabel:"Pre-Launch · Waitlist Open",
+    body:"A dashboard + calendar built from a guided conversation, not a template — for entrepreneurs running 3+ income streams. First 20 people get 6 months free in exchange for a 20-minute onboarding call.",
+    stat:{label:"Revenue ($)", defaultNum:0},
+    projected:{label:"ARR target ($)", defaultNum:50000}
+  },
+];
+
 const totalRealizedEl = document.getElementById('totalRealized');
 const totalProjectedEl = document.getElementById('totalProjected');
 const STORAGE_PREFIX = 'venture-value:';
-const ORDER_KEY = 'card-order';
 
 function fmtMoney(n){
   const sign = n < 0 ? '-' : '';
@@ -913,39 +1118,25 @@ async function saveValue2(key, value){
   }catch(e){ console.error('storage save failed', e); }
 }
 
-async function loadOrder(gridKey){
+const currentValues = {};
+const projectedValues = {};
+const sizeOverrides = {};
+const SIZE_PREFIX = 'venture-size:';
+
+async function loadSize(name){
   try{
-    const res = await window.storage.get(gridKey, false);
-    if(res && res.value) return JSON.parse(res.value);
-  }catch(e){ /* no saved order yet */ }
-  return null;
+    const res = await window.storage.get(SIZE_PREFIX+name, false);
+    if(res && res.value !== undefined && res.value !== null && res.value !== ''){
+      const n = Number(res.value);
+      return isNaN(n) ? 1 : n;
+    }
+  }catch(e){ /* not set yet */ }
+  return 1;
 }
-
-async function saveOrder(gridEl, gridKey){
-  const order = Array.from(gridEl.querySelectorAll('.card')).map(c=>c.dataset.name);
-  try{
-    await window.storage.set(gridKey, JSON.stringify(order), false);
-  }catch(e){ console.error('order save failed', e); }
+async function saveSize(name, mult){
+  try{ await window.storage.set(SIZE_PREFIX+name, String(mult), false); }
+  catch(e){ console.error('size save failed', e); }
 }
-
-const IDEA_ORDER_KEY = 'idea-order';
-const SECTION_OVERRIDES_KEY = 'venture-section-overrides';
-
-async function loadSectionOverrides(){
-  try{
-    const res = await window.storage.get(SECTION_OVERRIDES_KEY, false);
-    if(res && res.value) return JSON.parse(res.value);
-  }catch(e){ /* none yet */ }
-  return {};
-}
-
-async function saveSectionOverrides(map){
-  try{
-    await window.storage.set(SECTION_OVERRIDES_KEY, JSON.stringify(map), false);
-  }catch(e){ console.error('section override save failed', e); }
-}
-
-let sectionOverrides = {};
 
 function recomputeTotal(){
   let realized = 0, projected = 0;
@@ -957,48 +1148,227 @@ function recomputeTotal(){
   totalProjectedEl.textContent = fmtMoney(projected);
 }
 
-const currentValues = {};
-const projectedValues = {};
+// ============ HEATMAP (squarified treemap) ============
+function worstRatio(row, length){
+  const sum = row.reduce((a,b)=>a+b,0);
+  const max = Math.max(...row);
+  const min = Math.min(...row);
+  if(sum === 0) return Infinity;
+  return Math.max((length*length*max)/(sum*sum), (sum*sum)/(length*length*min));
+}
 
+function squarify(values, x, y, w, h, result, items){
+  if(values.length === 0) return;
+  if(values.length === 1){
+    result.push({x, y, w, h, item:items[0]});
+    return;
+  }
+  const length = Math.min(w,h);
+  let row = [values[0]];
+  let rowItems = [items[0]];
+  let i = 1;
+  while(i < values.length){
+    const testRow = row.concat([values[i]]);
+    if(worstRatio(testRow, length) <= worstRatio(row, length)){
+      row = testRow;
+      rowItems.push(items[i]);
+      i++;
+    } else break;
+  }
+  const rowSum = row.reduce((a,b)=>a+b,0);
+  const isWide = w >= h;
+  if(isWide){
+    const rowWidth = rowSum / h;
+    let curY = y;
+    row.forEach((v,idx)=>{
+      const rowHeight = v / (rowWidth || 1);
+      result.push({x, y:curY, w:rowWidth, h:rowHeight, item:rowItems[idx]});
+      curY += rowHeight;
+    });
+    squarify(values.slice(row.length), x+rowWidth, y, w-rowWidth, h, result, items.slice(row.length));
+  } else {
+    const rowHeight = rowSum / w;
+    let curX = x;
+    row.forEach((v,idx)=>{
+      const rowWidth = v / (rowHeight || 1);
+      result.push({x:curX, y, w:rowWidth, h:rowHeight, item:rowItems[idx]});
+      curX += rowWidth;
+    });
+    squarify(values.slice(row.length), x, y+rowHeight, w, h-rowHeight, result, items.slice(row.length));
+  }
+}
+
+const heatmapOuter = document.getElementById('heatmapOuter');
+const heatBackdrop = document.getElementById('heatBackdrop');
+
+function tileValue(v){
+  const realized = currentValues[v.name] || 0;
+  const projected = projectedValues[v.name] || 0;
+  const mult = sizeOverrides[v.name] || 1;
+  // floor so zero-value ventures still get a visible tile
+  return Math.max(Math.abs(realized) + Math.abs(projected), 400) * mult;
+}
+
+function renderHeatmap(){
+  heatmapOuter.innerHTML = '';
+  const rect = heatmapOuter.getBoundingClientRect();
+  const w = rect.width || 1000;
+  const h = rect.height || 460;
+
+  const sorted = [...ventures].sort((a,b)=> tileValue(b) - tileValue(a));
+  const values = sorted.map(tileValue);
+  const totalArea = w*h;
+  const sum = values.reduce((a,b)=>a+b,0) || 1;
+  const scaled = values.map(v => (v/sum)*totalArea);
+
+  const layout = [];
+  squarify(scaled, 0, 0, w, h, layout, sorted);
+
+  layout.forEach(tile=>{
+    const v = tile.item;
+    const realized = currentValues[v.name] || 0;
+    const projected = projectedValues[v.name] || 0;
+    const area = tile.w * tile.h;
+    const nameSize = Math.max(11, Math.min(20, Math.sqrt(area)/9));
+    const showBody = area > 9000;
+
+    const el = document.createElement('div');
+    el.className = `heat-tile ${v.status}`;
+    el.style.left = tile.x+'px';
+    el.style.top = tile.y+'px';
+    el.style.width = Math.max(tile.w-2,20)+'px';
+    el.style.height = Math.max(tile.h-2,20)+'px';
+    el.dataset.name = v.name;
+
+    el.innerHTML = `
+      <div>
+        <div class="heat-name" style="font-size:${nameSize}px;">${v.name}</div>
+        <div class="heat-sub" style="font-size:${Math.max(9,nameSize*0.55)}px;">${v.code}</div>
+      </div>
+      <div class="heat-value" style="font-size:${Math.max(11,nameSize*0.85)}px;">${fmtMoney(realized)} <span style="opacity:.6;font-weight:400;">/ ${fmtMoney(projected)} proj</span></div>
+    `;
+
+    el.addEventListener('click', ()=> expandTile(v));
+    heatmapOuter.appendChild(el);
+  });
+}
+
+function expandTile(v){
+  heatBackdrop.classList.add('show');
+  const el = document.createElement('div');
+  el.className = `heat-tile expanded ${v.status}`;
+  const taskKey = 'venture-tasks:' + v.name;
+
+  el.innerHTML = `
+    <div class="card-top">
+      <div>
+        <div class="heat-name" style="font-size:19px;">${v.name}</div>
+        <div class="heat-sub" style="font-size:11px;">${v.code}</div>
+      </div>
+      <button type="button" class="card-flip-btn" id="closeTileBtn">close &times;</button>
+    </div>
+    <div class="heat-body">${v.body}</div>
+    <div class="edit-row">
+      <label>${v.stat.label}</label>
+      <input type="number" step="1" class="value-input" data-key="${v.name}" data-kind="realized" value="${currentValues[v.name]||0}">
+      <span class="saved-tick">saved</span>
+    </div>
+    <div class="edit-row">
+      <label>${v.projected ? v.projected.label : 'Projected ($)'}</label>
+      <input type="number" step="1" class="value-input" data-key="${v.name}" data-kind="projected" value="${projectedValues[v.name]||0}">
+      <span class="saved-tick">saved</span>
+    </div>
+    <label style="font-family:'IBM Plex Mono',monospace;font-size:10px;color:rgba(255,255,255,0.6);text-transform:uppercase;letter-spacing:.05em;display:block;margin:12px 0 4px;">Tile Size <span style="opacity:.6;">(relative to other tiles)</span></label>
+    <div style="display:flex;align-items:center;gap:8px;">
+      <button type="button" id="sizeDownBtn" class="card-flip-btn" style="font-size:14px;padding:4px 12px;">&minus;</button>
+      <div id="sizeReadout" style="font-family:'IBM Plex Mono',monospace;font-size:12px;color:#fff;min-width:50px;text-align:center;">${Math.round((sizeOverrides[v.name]||1)*100)}%</div>
+      <button type="button" id="sizeUpBtn" class="card-flip-btn" style="font-size:14px;padding:4px 12px;">+</button>
+      <button type="button" id="sizeResetBtn" class="card-flip-btn" style="margin-left:auto;">reset</button>
+    </div>
+    <label style="font-family:'IBM Plex Mono',monospace;font-size:10px;color:rgba(255,255,255,0.6);text-transform:uppercase;letter-spacing:.05em;display:block;margin:12px 0 4px;">Tasks</label>
+    <textarea class="venture-task-input" data-taskkey="${taskKey}" style="width:100%;min-height:90px;background:rgba(0,0,0,0.3);border:1px solid rgba(255,255,255,0.2);border-radius:6px;padding:8px;color:#fff;font-family:'IBM Plex Mono',monospace;font-size:12px;"></textarea>
+  `;
+  document.body.appendChild(el);
+
+  const sizeReadout = el.querySelector('#sizeReadout');
+  function applySize(mult){
+    mult = Math.max(0.25, Math.min(4, mult));
+    sizeOverrides[v.name] = mult;
+    sizeReadout.textContent = Math.round(mult*100)+'%';
+    saveSize(v.name, mult);
+    renderHeatmapKeepExpanded();
+  }
+  el.querySelector('#sizeUpBtn').addEventListener('click', ()=> applySize((sizeOverrides[v.name]||1)+0.25));
+  el.querySelector('#sizeDownBtn').addEventListener('click', ()=> applySize((sizeOverrides[v.name]||1)-0.25));
+  el.querySelector('#sizeResetBtn').addEventListener('click', ()=> applySize(1));
+
+  function renderHeatmapKeepExpanded(){
+    // re-render the tiles behind the expanded modal without closing it
+    renderHeatmap();
+  }
+
+  loadValue2(taskKey, '').then(val=>{
+    el.querySelector('.venture-task-input').value = val;
+  });
+
+  el.querySelector('.venture-task-input').addEventListener('input', (e)=>{
+    clearTimeout(el._taskTimer);
+    el._taskTimer = setTimeout(()=> saveValue2(taskKey, e.target.value), 500);
+  });
+
+  el.querySelectorAll('.value-input').forEach(input=>{
+    input.addEventListener('input', ()=>{
+      clearTimeout(input._timer);
+      input._timer = setTimeout(async ()=>{
+        const key = input.dataset.key;
+        const kind = input.dataset.kind;
+        const num = Number(input.value) || 0;
+        if(kind==='realized'){ currentValues[key] = num; await saveValue(key+':realized', num); }
+        else { projectedValues[key] = num; await saveValue(key+':projected', num); }
+        recomputeTotal();
+        const tick = input.parentElement.querySelector('.saved-tick');
+        tick.classList.add('show');
+        setTimeout(()=>tick.classList.remove('show'), 1200);
+      }, 500);
+    });
+  });
+
+  function close(){
+    el.remove();
+    heatBackdrop.classList.remove('show');
+    renderHeatmap();
+  }
+  el.querySelector('#closeTileBtn').addEventListener('click', close);
+  heatBackdrop.onclick = close;
+}
+
+window.addEventListener('resize', ()=>{
+  clearTimeout(window._heatResizeTimer);
+  window._heatResizeTimer = setTimeout(renderHeatmap, 200);
+});
+
+// ============ Business Ideas grid (unchanged card layout) ============
 const ideaGrid = document.getElementById('ideaGrid');
+const IDEA_ORDER_KEY = 'idea-order';
 
-const businessIdeas = [
-  {
-    name:"Frankie — Guided Dashboard Builder", code:"IDEA · pre-launch, waitlist open", rating:0, status:"pre",
-    statusLabel:"Pre-Launch · Waitlist Open",
-    body:"A dashboard + calendar built from a guided conversation, not a template — for entrepreneurs running 3+ income streams. First 20 people get 6 months free in exchange for a 20-minute onboarding call. Modeled toward $50K ARR (see business plan).",
-    stat:{label:"Revenue ($)", defaultNum:0},
-    projected:{label:"ARR target ($)", defaultNum:50000}
-  },
-];
+async function loadOrder(gridKey){
+  try{
+    const res = await window.storage.get(gridKey, false);
+    if(res && res.value) return JSON.parse(res.value);
+  }catch(e){ /* no saved order yet */ }
+  return null;
+}
+async function saveOrder(gridEl, gridKey){
+  const order = Array.from(gridEl.querySelectorAll('.card')).map(c=>c.dataset.name);
+  try{ await window.storage.set(gridKey, JSON.stringify(order), false); }
+  catch(e){ console.error('order save failed', e); }
+}
 
 let draggedCard = null;
-let draggedFromGrid = null;
 
-async function moveVentureAcrossSections(name, targetGridEl){
-  const fromArr = ventures.find(v=>v.name===name) ? ventures : businessIdeas;
-  const toArr = targetGridEl === grid ? ventures : businessIdeas;
-  if(fromArr === toArr) return;
-  const idx = fromArr.findIndex(v=>v.name===name);
-  if(idx === -1) return;
-  const [item] = fromArr.splice(idx, 1);
-  toArr.push(item);
-  sectionOverrides[name] = (targetGridEl === grid) ? 'active' : 'idea';
-  await saveSectionOverrides(sectionOverrides);
-}
-
-async function rerenderBothGrids(){
-  grid.innerHTML = '';
-  ideaGrid.innerHTML = '';
-  await buildCardGrid(ventures, grid);
-  await buildCardGrid(businessIdeas, ideaGrid);
-  refreshCalcVentureOptions();
-}
-
-async function buildCardGrid(list, gridEl){
+async function buildIdeaGrid(list, gridEl){
   let ordered = list;
-  const gridKey = (gridEl === grid) ? ORDER_KEY : IDEA_ORDER_KEY;
-  const savedOrder = await loadOrder(gridKey);
+  const savedOrder = await loadOrder(IDEA_ORDER_KEY);
   if(savedOrder){
     const byName = Object.fromEntries(list.map(v=>[v.name,v]));
     const reordered = savedOrder.map(n=>byName[n]).filter(Boolean);
@@ -1061,8 +1431,6 @@ async function buildCardGrid(list, gridEl){
     gridEl.appendChild(card);
   }
 
-  if(gridEl === grid) recomputeTotal();
-
   gridEl.querySelectorAll('.card-flip-btn').forEach(btn=>{
     btn.addEventListener('click', (e)=>{
       e.stopPropagation();
@@ -1076,13 +1444,10 @@ async function buildCardGrid(list, gridEl){
     let debounceTimer;
     textarea.addEventListener('input', ()=>{
       clearTimeout(debounceTimer);
-      debounceTimer = setTimeout(async ()=>{
-        await saveValue2(textarea.dataset.taskkey, textarea.value);
-      }, 500);
+      debounceTimer = setTimeout(async ()=>{ await saveValue2(textarea.dataset.taskkey, textarea.value); }, 500);
     });
   });
 
-  // Prevent HTML5 drag from hijacking clicks/typing on inputs, buttons, textareas
   gridEl.querySelectorAll('.card input, .card button, .card textarea').forEach(el=>{
     el.addEventListener('mousedown', (e)=>e.stopPropagation());
   });
@@ -1095,14 +1460,8 @@ async function buildCardGrid(list, gridEl){
         const key = input.dataset.key;
         const kind = input.dataset.kind;
         const num = Number(input.value) || 0;
-        if(kind==='realized'){
-          currentValues[key] = num;
-          await saveValue(key+':realized', num);
-        }else{
-          projectedValues[key] = num;
-          await saveValue(key+':projected', num);
-        }
-        if(gridEl === grid) recomputeTotal();
+        if(kind==='realized'){ currentValues[key] = num; await saveValue(key+':realized', num); }
+        else { projectedValues[key] = num; await saveValue(key+':projected', num); }
         const tick = input.parentElement.querySelector('.saved-tick');
         tick.classList.add('show');
         setTimeout(()=>tick.classList.remove('show'), 1200);
@@ -1110,98 +1469,58 @@ async function buildCardGrid(list, gridEl){
     });
   });
 
-  // ---- Cross-grid + within-grid drag and drop ----
   gridEl.querySelectorAll('.card').forEach(card=>{
-    card.addEventListener('dragstart', ()=>{
-      draggedCard = card;
-      draggedFromGrid = gridEl;
-      setTimeout(()=>card.classList.add('dragging'), 0);
-    });
-    card.addEventListener('dragend', async ()=>{
+    card.addEventListener('dragstart', ()=>{ draggedCard = card; setTimeout(()=>card.classList.add('dragging'),0); });
+    card.addEventListener('dragend', ()=>{
       draggedCard?.classList.remove('dragging');
-      document.querySelectorAll('.card').forEach(c=>c.classList.remove('drag-over'));
+      gridEl.querySelectorAll('.card').forEach(c=>c.classList.remove('drag-over'));
     });
-    card.addEventListener('dragover', (e)=>{
-      e.preventDefault();
-      if(card !== draggedCard) card.classList.add('drag-over');
-    });
-    card.addEventListener('dragleave', ()=>{
-      card.classList.remove('drag-over');
-    });
+    card.addEventListener('dragover', (e)=>{ e.preventDefault(); if(card!==draggedCard) card.classList.add('drag-over'); });
+    card.addEventListener('dragleave', ()=> card.classList.remove('drag-over'));
     card.addEventListener('drop', async (e)=>{
-      e.preventDefault();
-      e.stopPropagation();
+      e.preventDefault(); e.stopPropagation();
       card.classList.remove('drag-over');
-      if(!draggedCard || card === draggedCard) return;
-      const name = draggedCard.dataset.name;
-      const sameGrid = draggedFromGrid === gridEl;
-      if(!sameGrid){
-        await moveVentureAcrossSections(name, gridEl);
-        await rerenderBothGrids();
-        return;
-      }
+      if(!draggedCard || card===draggedCard) return;
       const cards = Array.from(gridEl.querySelectorAll('.card'));
-      const draggedIdx = cards.indexOf(draggedCard);
-      const targetIdx = cards.indexOf(card);
-      if(draggedIdx < targetIdx){ card.after(draggedCard); } else { card.before(draggedCard); }
-      await saveOrder(gridEl, gridKey);
+      const di = cards.indexOf(draggedCard), ti = cards.indexOf(card);
+      if(di<ti){ card.after(draggedCard); } else { card.before(draggedCard); }
+      await saveOrder(gridEl, IDEA_ORDER_KEY);
     });
-  });
-
-  // Allow dropping onto empty grid space (not on top of a specific card)
-  gridEl.addEventListener('dragover', (e)=>{ e.preventDefault(); });
-  gridEl.addEventListener('drop', async (e)=>{
-    if(e.target !== gridEl) return; // a card-level handler already dealt with it
-    e.preventDefault();
-    if(!draggedCard) return;
-    const name = draggedCard.dataset.name;
-    const sameGrid = draggedFromGrid === gridEl;
-    if(!sameGrid){
-      await moveVentureAcrossSections(name, gridEl);
-      await rerenderBothGrids();
-    }
   });
 }
 
 const CUSTOM_VENTURES_KEY = 'custom-ventures';
-
 async function loadCustomVentures(){
   try{
     const res = await window.storage.get(CUSTOM_VENTURES_KEY, false);
     if(res && res.value) return JSON.parse(res.value);
-  }catch(e){ /* none saved yet */ }
+  }catch(e){}
   return [];
 }
-
 async function saveCustomVentures(list){
-  try{
-    await window.storage.set(CUSTOM_VENTURES_KEY, JSON.stringify(list), false);
-  }catch(e){ console.error('custom venture save failed', e); }
+  try{ await window.storage.set(CUSTOM_VENTURES_KEY, JSON.stringify(list), false); }
+  catch(e){ console.error('custom venture save failed', e); }
 }
-
 let customVentures = [];
 
-async function initVentureGrid(){
+async function initAll(){
   customVentures = await loadCustomVentures();
   ventures.push(...customVentures);
 
-  sectionOverrides = await loadSectionOverrides();
-  for(const [name, section] of Object.entries(sectionOverrides)){
-    const inVentures = ventures.findIndex(v=>v.name===name);
-    const inIdeas = businessIdeas.findIndex(v=>v.name===name);
-    if(section === 'idea' && inVentures !== -1){
-      const [item] = ventures.splice(inVentures, 1);
-      businessIdeas.push(item);
-    } else if(section === 'active' && inIdeas !== -1){
-      const [item] = businessIdeas.splice(inIdeas, 1);
-      ventures.push(item);
-    }
+  for(const v of ventures){
+    const fallback = v.stat.defaultNum !== undefined ? v.stat.defaultNum : 0;
+    currentValues[v.name] = await loadValue(v.name+':realized', fallback);
+    const projFallback = v.projected ? v.projected.defaultNum : 0;
+    projectedValues[v.name] = await loadValue(v.name+':projected', projFallback);
+    sizeOverrides[v.name] = await loadSize(v.name);
   }
+  recomputeTotal();
+  renderHeatmap();
+  refreshCalcVentureOptions();
 
-  await buildCardGrid(ventures, grid);
-  await buildCardGrid(businessIdeas, ideaGrid);
+  await buildIdeaGrid(businessIdeas, ideaGrid);
 }
-initVentureGrid();
+initAll();
 
 // ---- Add Venture ----
 const addVentureBtn = document.getElementById('addVentureBtn');
@@ -1226,12 +1545,12 @@ addVentureBtn.addEventListener('click', ()=>{
 });
 cancelVentureBtn.addEventListener('click', ()=>{
   addVentureForm.style.display = 'none';
-  newVentureName.value = ''; newVentureCode.value = ''; newVentureRating.value = 5;
-  newVentureStatus.value = 'confirmed'; newVentureBody.value = '';
+  newVentureName.value=''; newVentureCode.value=''; newVentureRating.value=5;
+  newVentureStatus.value='confirmed'; newVentureBody.value='';
 });
 saveVentureBtn.addEventListener('click', async ()=>{
   const name = newVentureName.value.trim();
-  if(!name) { newVentureName.focus(); return; }
+  if(!name){ newVentureName.focus(); return; }
   const status = newVentureStatus.value;
   const newVenture = {
     name,
@@ -1246,12 +1565,181 @@ saveVentureBtn.addEventListener('click', async ()=>{
   ventures.push(newVenture);
   customVentures.push(newVenture);
   await saveCustomVentures(customVentures);
-  grid.innerHTML = '';
-  await buildCardGrid(ventures, grid);
+  currentValues[newVenture.name] = 0;
+  projectedValues[newVenture.name] = 0;
+  recomputeTotal();
+  renderHeatmap();
   refreshCalcVentureOptions();
   addVentureForm.style.display = 'none';
-  newVentureName.value = ''; newVentureCode.value = ''; newVentureRating.value = 5;
-  newVentureStatus.value = 'confirmed'; newVentureBody.value = '';
+  newVentureName.value=''; newVentureCode.value=''; newVentureRating.value=5;
+  newVentureStatus.value='confirmed'; newVentureBody.value='';
+});
+
+// ---- Personal Balance Sheet ----
+const BS_KEY = 'personal-balance-sheet';
+const BS_DEFAULT = {
+  cash: [
+    {name:"Chase Checking", value:2462.02},
+    {name:"Chase Savings", value:150.94},
+    {name:"UWCU Rewards Checking", value:7908.75},
+    {name:"UWCU Money Market", value:5577.34}
+  ],
+  public: [
+    {name:"Chase Brokerage", value:198886.49},
+    {name:"Chase Managed Portfolio", value:151436.75},
+    {name:"Schwab Day-to-Day Brokerage", value:26108.74},
+    {name:"Schwab Roth IRA", value:26000.00}
+  ],
+  private: [
+    {name:"Topline Capital", value:70000.00}
+  ],
+  realEstate: [
+    {name:"1222 W Maple St, Kalamazoo, MI", value:235000.00, sub:"estimated value"}
+  ],
+  managed: [
+    {name:"Inherited IRA", value:508320.88},
+    {name:"River Account", value:11760.43},
+    {name:"Other Managed IRAs/Brokerage", value:48170.70, sub:"aggregate only"}
+  ],
+  joint: [
+    {name:"Joint Venture Accounts", value:16614.79}
+  ],
+  liabilities: [
+    {name:"Chase Sapphire Reserve", value:470.42},
+    {name:"Bank of America Atmos Visa", value:964.01},
+    {name:"United Explorer", value:2.11}
+  ],
+  income: {
+    lifetimeClosedRevenue: 532974.00,
+    lifetimeCommissionEarned: 42637.92,
+    juneCommission: 3776.00,
+    julySalesClosed: 47000.00,
+    expectedAugustCommission: 3760.00
+  }
+};
+
+let bsData = JSON.parse(JSON.stringify(BS_DEFAULT));
+
+async function loadBalanceSheet(){
+  try{
+    const res = await window.storage.get(BS_KEY, false);
+    if(res && res.value) bsData = JSON.parse(res.value);
+  }catch(e){ /* use defaults */ }
+  renderBalanceSheet();
+}
+async function saveBalanceSheet(){
+  try{ await window.storage.set(BS_KEY, JSON.stringify(bsData), false); }
+  catch(e){ console.error('balance sheet save failed', e); }
+}
+
+function bsSum(arr){ return arr.reduce((s,i)=>s+(Number(i.value)||0),0); }
+
+function renderRowGroup(containerId, arr, groupKey){
+  const container = document.getElementById(containerId);
+  container.innerHTML = '';
+  arr.forEach((item, idx)=>{
+    const row = document.createElement('div');
+    row.className = 'bs-row';
+    row.innerHTML = `
+      <span class="bs-name">${item.name}${item.sub ? `<span class="bs-sub">${item.sub}</span>` : ''}</span>
+      <input type="number" step="0.01" data-group="${groupKey}" data-idx="${idx}" value="${item.value}">
+    `;
+    container.appendChild(row);
+  });
+  container.querySelectorAll('input').forEach(input=>{
+    input.addEventListener('input', ()=>{
+      clearTimeout(input._t);
+      input._t = setTimeout(async ()=>{
+        const g = input.dataset.group, i = Number(input.dataset.idx);
+        bsData[g][i].value = Number(input.value) || 0;
+        await saveBalanceSheet();
+        renderBalanceSheet();
+      }, 500);
+    });
+  });
+}
+
+function renderBalanceSheet(){
+  renderRowGroup('bsCashRows', bsData.cash, 'cash');
+  renderRowGroup('bsPublicRows', bsData.public, 'public');
+  renderRowGroup('bsPrivateRows', bsData.private, 'private');
+  renderRowGroup('bsRealEstateRows', bsData.realEstate, 'realEstate');
+  renderRowGroup('bsManagedRows', bsData.managed, 'managed');
+  renderRowGroup('bsJointRows', bsData.joint, 'joint');
+  renderRowGroup('bsLiabilityRows', bsData.liabilities, 'liabilities');
+
+  const cashTotal = bsSum(bsData.cash);
+  const publicTotal = bsSum(bsData.public);
+  const privateTotal = bsSum(bsData.private);
+  const realEstateTotal = bsSum(bsData.realEstate);
+  const managedTotal = bsSum(bsData.managed);
+  const liabilityTotal = bsSum(bsData.liabilities);
+  const totalAssets = cashTotal + publicTotal + privateTotal + realEstateTotal;
+
+  document.getElementById('bsCashTotal').textContent = fmtMoney(cashTotal);
+  document.getElementById('bsPublicTotal').textContent = fmtMoney(publicTotal);
+  document.getElementById('bsPrivateTotal').textContent = fmtMoney(privateTotal);
+  document.getElementById('bsRealEstateTotal').textContent = fmtMoney(realEstateTotal);
+  document.getElementById('bsManagedTotal').textContent = fmtMoney(managedTotal);
+  document.getElementById('bsLiabilityTotal').textContent = fmtMoney(liabilityTotal);
+  document.getElementById('bsTotalAssets').textContent = fmtMoney(totalAssets);
+  document.getElementById('bsTotalAssetsSub').textContent = `cash + public + private + real estate, net of nothing — liabilities tracked separately`;
+
+  const inc = bsData.income;
+  const incRows = document.getElementById('bsIncomeRows');
+  const incFields = [
+    {key:'lifetimeClosedRevenue', label:'Lifetime Closed Revenue'},
+    {key:'lifetimeCommissionEarned', label:'Lifetime Commission Earned'},
+    {key:'juneCommission', label:'June Commission (outstanding)'},
+    {key:'julySalesClosed', label:'July Sales Closed'},
+    {key:'expectedAugustCommission', label:'Expected August Commission'}
+  ];
+  incRows.innerHTML = incFields.map(f=>`
+    <div class="bs-row">
+      <span class="bs-name">${f.label}</span>
+      <input type="number" step="0.01" data-inc="${f.key}" value="${inc[f.key]}">
+    </div>
+  `).join('');
+  incRows.querySelectorAll('input').forEach(input=>{
+    input.addEventListener('input', ()=>{
+      clearTimeout(input._t);
+      input._t = setTimeout(async ()=>{
+        bsData.income[input.dataset.inc] = Number(input.value) || 0;
+        await saveBalanceSheet();
+      }, 500);
+    });
+  });
+}
+
+loadBalanceSheet();
+
+// ---- Quick Commission Calc (Income section) ----
+const incCalcAmount = document.getElementById('incCalcAmount');
+const incCalcResult = document.getElementById('incCalcResult');
+const incCalcTarget = document.getElementById('incCalcTarget');
+const incCalcApplyBtn = document.getElementById('incCalcApplyBtn');
+const incCalcStatus = document.getElementById('incCalcStatus');
+
+function updateIncCalc(){
+  const amt = Number(incCalcAmount.value) || 0;
+  incCalcResult.textContent = fmtMoney(amt * 0.08);
+}
+incCalcAmount.addEventListener('input', updateIncCalc);
+
+incCalcApplyBtn.addEventListener('click', async ()=>{
+  const amt = Number(incCalcAmount.value) || 0;
+  if(!amt) return;
+  const commission = amt * 0.08;
+  const target = incCalcTarget.value;
+  const isRevenueTarget = (target === 'julySalesClosed' || target === 'lifetimeClosedRevenue');
+  const addAmount = isRevenueTarget ? amt : commission;
+  bsData.income[target] = (Number(bsData.income[target]) || 0) + addAmount;
+  await saveBalanceSheet();
+  renderBalanceSheet();
+  incCalcStatus.textContent = `Added ${fmtMoney(addAmount)} to ${incCalcTarget.options[incCalcTarget.selectedIndex].text.replace(/^Add (deal \$|commission \$) to /,'')}`;
+  incCalcAmount.value = '';
+  updateIncCalc();
+  setTimeout(()=>{ incCalcStatus.textContent=''; }, 3000);
 });
 
 // ---- Contacts ----
@@ -1263,16 +1751,13 @@ const contactVenture = document.getElementById('contactVenture');
 const contactNotes = document.getElementById('contactNotes');
 const contactList = document.getElementById('contactList');
 
-// Populate venture dropdown from real venture + idea names
 [...ventures, ...businessIdeas].forEach(v=>{
   const opt = document.createElement('option');
-  opt.value = v.name;
-  opt.textContent = v.name;
+  opt.value = v.name; opt.textContent = v.name;
   contactVenture.appendChild(opt);
 });
 
 let contacts = [];
-
 function renderContacts(){
   contactList.innerHTML = '';
   if(contacts.length === 0){
@@ -1299,37 +1784,25 @@ function renderContacts(){
     });
   });
 }
-
 async function loadContacts(){
-  try{
-    const res = await window.storage.get(CONTACTS_KEY, false);
-    if(res && res.value) contacts = JSON.parse(res.value);
-  }catch(e){ contacts = []; }
+  try{ const res = await window.storage.get(CONTACTS_KEY, false); if(res && res.value) contacts = JSON.parse(res.value); }
+  catch(e){ contacts = []; }
   renderContacts();
 }
-
 async function saveContacts(){
-  try{
-    await window.storage.set(CONTACTS_KEY, JSON.stringify(contacts), false);
-  }catch(e){ console.error('contact save failed', e); }
+  try{ await window.storage.set(CONTACTS_KEY, JSON.stringify(contacts), false); }
+  catch(e){ console.error('contact save failed', e); }
 }
-
 contactForm.addEventListener('submit', async (e)=>{
   e.preventDefault();
   const name = contactName.value.trim();
   if(!name) return;
-  contacts.push({
-    name,
-    tag: contactTag.value.trim(),
-    venture: contactVenture.value,
-    notes: contactNotes.value.trim()
-  });
+  contacts.push({ name, tag: contactTag.value.trim(), venture: contactVenture.value, notes: contactNotes.value.trim() });
   await saveContacts();
   renderContacts();
   contactForm.reset();
   contactName.focus();
 });
-
 loadContacts();
 
 // ---- Deal Tracker ----
@@ -1343,15 +1816,8 @@ const dealTerms = document.getElementById('dealTerms');
 const dealNotes = document.getElementById('dealNotes');
 const dealList = document.getElementById('dealList');
 
-const DEAL_STATUS_CLASS = {
-  'Evaluating': 'pipeline',
-  'Active': 'confirmed',
-  'Closed': 'confirmed',
-  'Declined / Passed': 'risk'
-};
-
+const DEAL_STATUS_CLASS = { 'Evaluating':'pipeline', 'Active':'confirmed', 'Closed':'confirmed', 'Declined / Passed':'risk' };
 let deals = [];
-
 function renderDeals(){
   dealList.innerHTML = '';
   if(deals.length === 0){
@@ -1381,39 +1847,25 @@ function renderDeals(){
     });
   });
 }
-
 async function loadDeals(){
-  try{
-    const res = await window.storage.get(DEALS_KEY, false);
-    if(res && res.value) deals = JSON.parse(res.value);
-  }catch(e){ deals = []; }
+  try{ const res = await window.storage.get(DEALS_KEY, false); if(res && res.value) deals = JSON.parse(res.value); }
+  catch(e){ deals = []; }
   renderDeals();
 }
-
 async function saveDeals(){
-  try{
-    await window.storage.set(DEALS_KEY, JSON.stringify(deals), false);
-  }catch(e){ console.error('deal save failed', e); }
+  try{ await window.storage.set(DEALS_KEY, JSON.stringify(deals), false); }
+  catch(e){ console.error('deal save failed', e); }
 }
-
 dealForm.addEventListener('submit', async (e)=>{
   e.preventDefault();
   const name = dealName.value.trim();
   if(!name) return;
-  deals.push({
-    name,
-    type: dealType.value,
-    amount: dealAmount.value.trim(),
-    status: dealStatus.value,
-    terms: dealTerms.value.trim(),
-    notes: dealNotes.value.trim()
-  });
+  deals.push({ name, type: dealType.value, amount: dealAmount.value.trim(), status: dealStatus.value, terms: dealTerms.value.trim(), notes: dealNotes.value.trim() });
   await saveDeals();
   renderDeals();
   dealForm.reset();
   dealName.focus();
 });
-
 loadDeals();
 
 // ---- Revenue calculator ----
@@ -1430,13 +1882,11 @@ function refreshCalcVentureOptions(){
   calcVentureSelect.innerHTML = '';
   [...ventures, ...businessIdeas].forEach(v=>{
     const opt = document.createElement('option');
-    opt.value = v.name;
-    opt.textContent = v.name;
+    opt.value = v.name; opt.textContent = v.name;
     calcVentureSelect.appendChild(opt);
   });
   if(current) calcVentureSelect.value = current;
 }
-refreshCalcVentureOptions();
 
 function updateCalc(){
   const amt = Number(calcAmount.value) || 0;
@@ -1447,30 +1897,29 @@ calcAmount.addEventListener('input', updateCalc);
 calcRate.addEventListener('input', updateCalc);
 updateCalc();
 
-calcApplyBtn.addEventListener('click', ()=>{
+calcApplyBtn.addEventListener('click', async ()=>{
   const amt = Number(calcAmount.value) || 0;
   const rate = Number(calcRate.value) || 0;
   const value = Math.round(amt * (rate/100));
   const ventureName = calcVentureSelect.value;
   const kind = calcFieldSelect.value;
-  if(!ventureName){ return; }
+  if(!ventureName) return;
 
-  const targetInput = document.querySelector(
-    `.value-input[data-key="${CSS.escape(ventureName)}"][data-kind="${kind}"]`
-  );
-  if(!targetInput){
-    calcApplyStatus.textContent = 'Venture card not found on this page.';
-    calcApplyStatus.style.color = 'var(--red)';
-    return;
-  }
-  targetInput.value = value;
-  targetInput.dispatchEvent(new Event('input', { bubbles: true }));
+  if(kind==='realized'){ currentValues[ventureName] = value; await saveValue(ventureName+':realized', value); }
+  else { projectedValues[ventureName] = value; await saveValue(ventureName+':projected', value); }
+  recomputeTotal();
+  renderHeatmap();
+
+  // also sync business-idea card inputs if applicable
+  const targetInput = document.querySelector(`.value-input[data-key="${CSS.escape(ventureName)}"][data-kind="${kind}"]`);
+  if(targetInput) targetInput.value = value;
+
   calcApplyStatus.textContent = `Added $${value.toLocaleString()} to ${ventureName}`;
   calcApplyStatus.style.color = 'var(--green)';
   setTimeout(()=>{ calcApplyStatus.textContent = ''; }, 2500);
 });
 
-// ---- Tasks flip card ----
+// ---- Tasks flip card (sidebar) ----
 const tasksCard = document.getElementById('tasksCard');
 const taskInput = document.getElementById('taskInput');
 const taskCount = document.getElementById('taskCount');
@@ -1480,19 +1929,12 @@ function updateTaskCount(){
   const lines = taskInput.value.split('\n').map(l=>l.trim()).filter(Boolean);
   taskCount.textContent = lines.length + (lines.length===1?' item':' items');
 }
-
 (async ()=>{
-  try{
-    const res = await window.storage.get(TASKS_KEY, false);
-    if(res && res.value !== undefined) taskInput.value = res.value;
-  }catch(e){ /* nothing saved yet */ }
+  try{ const res = await window.storage.get(TASKS_KEY, false); if(res && res.value !== undefined) taskInput.value = res.value; }
+  catch(e){}
   updateTaskCount();
 })();
-
-tasksCard.addEventListener('click', ()=>{
-  tasksCard.classList.toggle('flipped');
-});
-
+tasksCard.addEventListener('click', ()=> tasksCard.classList.toggle('flipped'));
 let taskSaveTimer;
 taskInput.addEventListener('input', ()=>{
   updateTaskCount();
@@ -1503,7 +1945,7 @@ taskInput.addEventListener('input', ()=>{
   }, 500);
 });
 
-// Ticker strip content (duplicated for seamless loop)
+// Ticker
 const tickerData = ventures.map(v=>{
   let cls = 'flat';
   if(v.status==='confirmed') cls='up';
@@ -1518,32 +1960,18 @@ track.innerHTML = buildTicks() + buildTicks();
 // Calendar for July 2026
 const calGrid = document.getElementById('calGrid');
 const dows = ['S','M','T','W','T','F','S'];
-dows.forEach(d=>{
-  const el = document.createElement('div');
-  el.className='cal-dow';
-  el.textContent=d;
-  calGrid.appendChild(el);
-});
-const year=2026, month=6; // July = index 6
+dows.forEach(d=>{ const el=document.createElement('div'); el.className='cal-dow'; el.textContent=d; calGrid.appendChild(el); });
+const year=2026, month=6;
 const firstDay = new Date(year, month, 1).getDay();
 const daysInMonth = new Date(year, month+1, 0).getDate();
-const today = 9;
-for(let i=0;i<firstDay;i++){
-  const el=document.createElement('div');
-  el.className='cal-day empty';
-  calGrid.appendChild(el);
-}
-for(let d=1; d<=daysInMonth; d++){
-  const el=document.createElement('div');
-  el.className='cal-day'+(d===today?' today':'');
-  el.textContent=d;
-  calGrid.appendChild(el);
-}
+const today = 12;
+for(let i=0;i<firstDay;i++){ const el=document.createElement('div'); el.className='cal-day empty'; calGrid.appendChild(el); }
+for(let d=1; d<=daysInMonth; d++){ const el=document.createElement('div'); el.className='cal-day'+(d===today?' today':''); el.textContent=d; calGrid.appendChild(el); }
 
 // Open items
 const items = [
-  {tag:"ZGM Loan", risk:true, text:"Get attorney review of Shonn's final docs before any funds move — <b>securities characterization</b> is the live concern."},
-  {tag:"ZGM Loan", risk:true, text:"Still unanswered: does the $20K obligation survive if the assigned location closes, or is it tied only to that location?"},
+  {tag:"ZGM Loan", risk:true, text:"Get attorney review of the final docs before any funds move — <b>securities characterization</b> of the revenue-share payment formula is the live concern."},
+  {tag:"ZGM Loan", risk:true, text:"Confirm whether they've filed a Form D / have a private placement memorandum if raising from multiple lenders."},
   {tag:"ZGM Loan", risk:false, text:"Request the specific location's real financials (bank statements / tax returns) — the July report was company-wide, not location-level."},
   {tag:"Roofing Collections", risk:false, text:"Complete Oregon ORS 697 collection agency registration + post $10-15K surety bond before operating."},
   {tag:"ES Futures", risk:false, text:"Navigate the 20% consistency rule across funded accounts toward first payout eligibility."},
@@ -1556,31 +1984,11 @@ items.forEach(it=>{
   itemsList.appendChild(li);
 });
 
-// ---- Frankie Terminal (LLM grounded in the portfolio data above) ----
-const portfolioContext = JSON.stringify(ventures, null, 2);
-const openItemsContext = JSON.stringify(items, null, 2);
-
-const systemPrompt = `You are "Frankie" — a direct, money-focused, no-fluff terminal assistant embedded in Fanny's personal venture dashboard. You are NOT a general chatbot; you answer questions ONLY about the ventures and open items listed below, which is the sum total of what you know.
-
-Hard rules:
-- Only use the data provided below. Do not invent numbers, dates, deadlines, or facts not present here.
-- If asked something not covered by this data (e.g. "what's HOOD trading at right now", "what should I do next month"), say plainly that you don't have that information rather than guessing.
-- Never state assumptions as fact. Flag them as assumptions if you make any.
-- Keep answers tight and factual — no filler, no motivational language, no unsolicited opinions unless asked.
-- This snapshot is dated July 9, 2026 and is NOT live data.
-
-VENTURE DATA:
-${portfolioContext}
-
-OPEN ITEMS:
-${openItemsContext}`;
-
+// ---- Frankie Terminal (placeholder — not wired to a live model) ----
 const chatLog = document.getElementById('chatLog');
 const chatForm = document.getElementById('chatForm');
 const chatInput = document.getElementById('chatInput');
 const sendBtn = chatForm.querySelector('.chat-send');
-
-let history = [];
 
 function addMsg(who, text, cls){
   const div = document.createElement('div');
@@ -1591,57 +1999,15 @@ function addMsg(who, text, cls){
   chatLog.scrollTop = chatLog.scrollHeight;
   return div;
 }
+addMsg('FRANKIE', "This terminal isn't wired to a live model yet — coming soon.", 'assistant');
 
-addMsg('FRANKIE', "Ask me about your positions, ratings, or open items. I only know what's on this page — nothing live.", 'assistant');
-
-chatForm.addEventListener('submit', async (e)=>{
+chatForm.addEventListener('submit', (e)=>{
   e.preventDefault();
   const q = chatInput.value.trim();
   if(!q) return;
   addMsg('YOU', q, 'user');
-  history.push({role:'user', content:q});
-  chatInput.value='';
-  sendBtn.disabled = true;
-  const pending = addMsg('FRANKIE', 'thinking...', 'assistant pending');
-
-  try{
-    const resp = await fetch('https://api.anthropic.com/v1/messages', {
-      method:'POST',
-      headers:{'Content-Type':'application/json'},
-      body: JSON.stringify({
-        model:'claude-sonnet-4-6',
-        max_tokens:600,
-        system: systemPrompt,
-        messages: history
-      })
-    });
-
-    const raw = await resp.text();
-    let data;
-    try{
-      data = JSON.parse(raw);
-    }catch(parseErr){
-      throw new Error('Non-JSON response (status '+resp.status+'): '+raw.slice(0,200));
-    }
-
-    if(!resp.ok){
-      const msg = (data && data.error && data.error.message) ? data.error.message : JSON.stringify(data);
-      throw new Error('API error (status '+resp.status+'): '+msg);
-    }
-
-    const textBlocks = (data.content||[]).filter(b=>b.type==='text').map(b=>b.text);
-    const answer = textBlocks.join('\n').trim() || "No response returned.";
-    pending.remove();
-    addMsg('FRANKIE', answer, 'assistant');
-    history.push({role:'assistant', content:answer});
-  }catch(err){
-    pending.remove();
-    addMsg('FRANKIE', 'Error: ' + err.message, 'assistant');
-    console.error(err);
-  }finally{
-    sendBtn.disabled = false;
-    chatInput.focus();
-  }
+  chatInput.value = '';
+  addMsg('FRANKIE', "Not wired to a live model yet — this is a placeholder.", 'assistant');
 });
 </script>
 </body>
