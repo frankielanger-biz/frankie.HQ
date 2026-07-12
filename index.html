@@ -761,6 +761,23 @@
 
     <div class="main-col">
       <div class="section-label">Business Ideas <span style="font-weight:400;text-transform:none;">(pre-launch, not counted in totals above)</span></div>
+      <div class="add-venture-row">
+        <button id="addIdeaBtn" class="add-venture-btn">+ Add Business Idea</button>
+      </div>
+      <div class="panel add-venture-form" id="addIdeaForm" style="display:none;">
+        <label>Name</label>
+        <input type="text" id="newIdeaName" placeholder="e.g. Subscription Box for Roofers">
+        <label>Code / Category</label>
+        <input type="text" id="newIdeaCode" placeholder="e.g. IDEA · pre-launch">
+        <label>Description</label>
+        <input type="text" id="newIdeaBody" placeholder="Short description">
+        <label>ARR Target ($)</label>
+        <input type="number" id="newIdeaTarget" placeholder="50000">
+        <div class="add-venture-actions">
+          <button id="saveIdeaBtn" class="add-venture-btn">Save</button>
+          <button id="cancelIdeaBtn" class="add-venture-cancel">Cancel</button>
+        </div>
+      </div>
       <div class="grid" id="ideaGrid"></div>
     </div>
   </div>
@@ -1503,9 +1520,26 @@ async function saveCustomVentures(list){
 }
 let customVentures = [];
 
+const CUSTOM_IDEAS_KEY = 'custom-ideas';
+async function loadCustomIdeas(){
+  try{
+    const res = await window.storage.get(CUSTOM_IDEAS_KEY, false);
+    if(res && res.value) return JSON.parse(res.value);
+  }catch(e){}
+  return [];
+}
+async function saveCustomIdeas(list){
+  try{ await window.storage.set(CUSTOM_IDEAS_KEY, JSON.stringify(list), false); }
+  catch(e){ console.error('custom idea save failed', e); }
+}
+let customIdeas = [];
+
 async function initAll(){
   customVentures = await loadCustomVentures();
   ventures.push(...customVentures);
+
+  customIdeas = await loadCustomIdeas();
+  businessIdeas.push(...customIdeas);
 
   for(const v of ventures){
     const fallback = v.stat.defaultNum !== undefined ? v.stat.defaultNum : 0;
@@ -1573,6 +1607,49 @@ saveVentureBtn.addEventListener('click', async ()=>{
   addVentureForm.style.display = 'none';
   newVentureName.value=''; newVentureCode.value=''; newVentureRating.value=5;
   newVentureStatus.value='confirmed'; newVentureBody.value='';
+});
+
+// ---- Add Business Idea ----
+const addIdeaBtn = document.getElementById('addIdeaBtn');
+const addIdeaForm = document.getElementById('addIdeaForm');
+const saveIdeaBtn = document.getElementById('saveIdeaBtn');
+const cancelIdeaBtn = document.getElementById('cancelIdeaBtn');
+const newIdeaName = document.getElementById('newIdeaName');
+const newIdeaCode = document.getElementById('newIdeaCode');
+const newIdeaBody = document.getElementById('newIdeaBody');
+const newIdeaTarget = document.getElementById('newIdeaTarget');
+
+addIdeaBtn.addEventListener('click', ()=>{
+  addIdeaForm.style.display = addIdeaForm.style.display === 'none' ? 'block' : 'none';
+});
+function resetIdeaForm(){
+  addIdeaForm.style.display = 'none';
+  newIdeaName.value=''; newIdeaCode.value=''; newIdeaBody.value=''; newIdeaTarget.value='';
+}
+cancelIdeaBtn.addEventListener('click', resetIdeaForm);
+saveIdeaBtn.addEventListener('click', async ()=>{
+  const name = newIdeaName.value.trim();
+  if(!name){ newIdeaName.focus(); return; }
+  const target = Number(newIdeaTarget.value) || 0;
+  const newIdea = {
+    name,
+    code: newIdeaCode.value.trim() || 'IDEA · pre-launch',
+    rating: 0,
+    status: 'pre',
+    statusLabel: 'Pre-Launch',
+    body: newIdeaBody.value.trim() || 'No description yet.',
+    stat: {label:'Revenue ($)', defaultNum:0},
+    projected: {label:'ARR target ($)', defaultNum: target}
+  };
+  businessIdeas.push(newIdea);
+  customIdeas.push(newIdea);
+  await saveCustomIdeas(customIdeas);
+  currentValues[newIdea.name] = 0;
+  projectedValues[newIdea.name] = target;
+  ideaGrid.innerHTML = '';
+  await buildIdeaGrid(businessIdeas, ideaGrid);
+  refreshCalcVentureOptions();
+  resetIdeaForm();
 });
 
 // ---- Personal Balance Sheet ----
